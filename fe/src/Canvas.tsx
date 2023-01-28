@@ -1,15 +1,32 @@
-import React, { useRef, useState, useEffect } from "react";
+import {
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  ForwardedRef,
+} from "react";
 import { Hands, Results, HAND_CONNECTIONS } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawLandmarks, drawConnectors } from "@mediapipe/drawing_utils";
 import "./Canvas.scss";
+
+export interface Props {
+  width: number;
+  height: number;
+  onRecordEnd?: (data: Blob) => any;
+}
+
+export interface Ref {
+  start: () => void;
+  pause: () => void;
+  stop: () => void;
+}
 
 function onResults(
   cx: CanvasRenderingContext2D,
   cvs: HTMLCanvasElement,
   results: Results
 ) {
-  console.log("updating results");
   cx.save();
   cx.clearRect(0, 0, cvs.width, cvs.height);
   cx.drawImage(results.image, 0, 0, cvs.width, cvs.height);
@@ -25,21 +42,40 @@ function onResults(
   cx.restore();
 }
 
-export default function Canvas() {
+function Canvas_(
+  { width, height, onRecordEnd }: Readonly<Props>,
+  ref: ForwardedRef<Ref>
+) {
   const cvs = useRef<HTMLCanvasElement | null>(null);
   const vid = useRef<HTMLVideoElement | null>(null);
   const cx = useRef<CanvasRenderingContext2D | null>(null);
   const hands = useRef<Hands | null>(null);
   const cam = useRef<Camera | null>(null);
+  const rec = useRef<MediaRecorder | null>(null);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      start: () => {
+        rec.current?.start();
+      },
+      stop: () => {
+        rec.current?.stop();
+      },
+      pause: () => {
+        rec.current?.pause();
+      },
+    }),
+    [rec]
+  );
+
+  // Initial setup sequence.
   useEffect(() => {
     if (cvs.current === null || vid.current === null) {
-      throw Error("oh no");
+      throw Error("unreachable");
     }
 
     cx.current = cvs.current?.getContext("2d") ?? null;
-
-    // hands.current = new Hands({});
 
     hands.current = new Hands({
       locateFile: (file) => {
@@ -56,7 +92,6 @@ export default function Canvas() {
     });
 
     hands.current!.onResults((r) => {
-      console.log("onResult");
       if (cx.current && cvs.current) {
         onResults(cx.current, cvs.current, r);
       }
@@ -65,12 +100,20 @@ export default function Canvas() {
     cam.current = new Camera(vid.current, {
       onFrame: async () => {
         await hands.current!.send({ image: vid.current! });
-        console.log("onFrame");
       },
-      width: 1280,
-      height: 720,
+      width,
+      height,
     });
+
     cam.current!.start();
+
+    rec.current = new MediaRecorder(cvs.current!.captureStream(30), {
+      audioBitsPerSecond: 128000,
+      videoBitsPerSecond: 2500000,
+      mimeType: "video/webm",
+    });
+
+    rec.current!.ondataavailable = (e: BlobEvent) => onRecordEnd?.(e.data);
   }, []);
 
   return (
@@ -78,10 +121,13 @@ export default function Canvas() {
       <video style={{ display: "none" }} className="input_video" ref={vid} />
       <canvas
         className="output_canvas"
-        width="1280px"
-        height="720px"
+        width={`${width}px`}
+        height={`${height}px`}
         ref={cvs}
       />
     </div>
   );
 }
+
+const Canvas = forwardRef<Ref, Props>(Canvas_);
+export default Canvas;
