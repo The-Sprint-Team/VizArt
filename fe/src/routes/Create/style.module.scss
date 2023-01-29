@@ -41,10 +41,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 100px;
 }
 
 .canvasOptions {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.recordingCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ff0000;
+  //top left
 }

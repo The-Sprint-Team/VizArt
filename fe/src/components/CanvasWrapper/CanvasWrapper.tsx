@@ -2,22 +2,18 @@ import { ForwardedRef, forwardRef } from "react";
 import Canvas, { Ref, Props as CanvasProps } from "../Canvas/Canvas";
 
 type Props = {
-  start: () => any;
-  stop: () => any;
-  pause: () => any;
+  width: number;
+  height: number;
   onRecordEnd: CanvasProps["onRecordEnd"];
 };
 
 function CanvasWrapper_(
-  { start, stop, pause, onRecordEnd }: Props,
+  { width, height, onRecordEnd }: Props,
   ref: ForwardedRef<Ref>
 ) {
   return (
     <div>
-      <button onClick={start}>Start</button>
-      <button onClick={stop}>Stop</button>
-      <button onClick={pause}>Pause</button>
-      <Canvas width={1280} height={720} {...{ ref, onRecordEnd }} />
+      <Canvas width={width} height={height} {...{ ref, onRecordEnd }} />
     </div>
   );
 }

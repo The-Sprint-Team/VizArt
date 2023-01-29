@@ -1,6 +1,6 @@
 .container {
   width: 300px;
-  height: 400px;
+  height: 360px;
   border-radius: 5px;
   background-color: rgb(211, 211, 211);
   padding: 5px 30px;
@@ -9,11 +9,14 @@
 .title {
   font-family: "Open Sans", sans-serif;
   font-size: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .thumbnail {
   width: 300px;
-  height: 200px;
+  height: 168.75px;
 }
 
 .date {
