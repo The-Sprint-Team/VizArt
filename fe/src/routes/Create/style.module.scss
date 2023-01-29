@@ -1,0 +1,50 @@
+.container {
+  padding: 30px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.canvasContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.actionContainer {
+}
+
+.action {
+}
+
+.canvas {
+  border: 1px solid #000;
+  background-color: rgb(48, 48, 48);
+  border-radius: 10px;
+  width: 1000px;
+  height: 500px;
+}
+
+.bottomBar {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.canvasOptions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

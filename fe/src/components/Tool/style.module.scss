@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 2px dashed #727272;
+  background-color: transparent;
+  border-radius: 5px;
+
+  &[data-active="true"] {
+    /* Attribute exists */
+    border: 2px solid #727272;
+    background-color: #727272;
+
+    .icon {
+      color: #000;
+    }
+
+    .name {
+      color: #000;
+    }
+  }
+
+  .icon {
+    font-size: 25px;
+    color: #727272;
+  }
+
+  .name {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    margin: 0;
+    color: #727272;
+  }
+}

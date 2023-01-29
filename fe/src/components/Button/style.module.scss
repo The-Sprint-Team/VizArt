@@ -1,0 +1,41 @@
+.button {
+  margin: 10px;
+  padding: 0px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: none;
+  background-color: #4a4a4a;
+  color: #fff;
+
+  .top {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    display: block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #6a6a6a;
+    transition: all 0.05s ease;
+    transform: translateY(-8px);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover .top {
+    cursor: pointer;
+    transform: translateY(-6px);
+  }
+
+  &:active .top {
+    transform: translateY(-1px);
+  }
+
+  &[data-pressed="true"] {
+    .top {
+      transform: translateY(-1px);
+    }
+  }
+}
