@@ -45,6 +45,7 @@ export enum Action {
   Eraser = "Eraser",
   Color = "Color",
   Clear = "Clear",
+  Generate = "Generate",
 }
 
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]

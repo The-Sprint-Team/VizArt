@@ -4,10 +4,10 @@ import {
   faPen,
   faEraser,
   faPalette,
-  faPaste,
+  faMagicWandSparkles,
   faBroom,
 } from "@fortawesome/free-solid-svg-icons";
-import { convertTime, secondsToMinutesSeconds } from "../../utils";
+import { secondsToMinutesSeconds } from "../../utils";
 
 import Modal from "../../components/Modal/Modal";
 import Tool from "../../components/Tool/Tool";
@@ -20,7 +20,6 @@ import CanvasWrapper, {
   Action,
 } from "../../components/CanvasWrapper/CanvasWrapper";
 import SizeCap from "../../components/SizeCap/SizeCap";
-import Loader from "../../components/Loader/Loader";
 
 import api from "../../api";
 import Tutorial from "../../components/Tutorial/Tutorial";
@@ -38,7 +37,7 @@ const tools: Tool[] = [
   { name: "Pen", icon: faPen },
   { name: "Eraser", icon: faEraser },
   { name: "Color", icon: faPalette },
-  { name: "Paste", icon: faPaste },
+  { name: "Generate", icon: faMagicWandSparkles },
   { name: "Clear", icon: faBroom },
 ];
 
@@ -58,9 +57,11 @@ export default function Create({ forcedTitle }: Props) {
   const navigate = useNavigate();
 
   const [artName, setArtName] = useState(forcedTitle ? forcedTitle : "");
+  const [generateName, setGenerateName] = useState("");
   const [showTutorial, setShowTutorial] = useState(false);
   const [showCompetitionRule, setShowCompetitionRule] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [showGenerate, setShowGenerate] = useState(false);
   const [time, setTime] = useState(0);
   const [actionChange, setActionChange] = useState<ActionChange>({
     a: Action.None,
@@ -113,6 +114,21 @@ export default function Create({ forcedTitle }: Props) {
     setShowPublish(!showPublish);
   };
 
+  const updateShowGenerate = () => {
+    if (!showGenerate) {
+      //pause video
+
+      //prevent scroll on body
+      document.body.style.overflow = "hidden";
+    } else {
+      //play video
+
+      //allow scroll on body
+      document.body.style.overflow = "auto";
+    }
+    setShowGenerate(!showGenerate);
+  };
+
   const onPublish = () => {
     if (vid !== null) {
       setIsLoading(true);
@@ -155,6 +171,8 @@ export default function Create({ forcedTitle }: Props) {
     updateShowPublish();
   };
 
+  const onGenerate = () => {};
+
   const resetDrawing = () => {};
 
   useEffect(() => {
@@ -185,6 +203,9 @@ export default function Create({ forcedTitle }: Props) {
 
   const onActionChange = (e: ActionChange) => {
     setActionChange(e);
+    if (e.a === Action.Generate) {
+      updateShowGenerate();
+    }
   };
 
   return (
@@ -306,12 +327,11 @@ export default function Create({ forcedTitle }: Props) {
                 description="Pick a color in the real world by doing an 'ok' sign!"
                 image="demoColorPick.png"
               />
-                <TutorialBlock
+              <TutorialBlock
                 title="Recording"
                 description="Record your drawing video and submit it!"
                 image="demoRecord.png"
               />
-
             </div>
 
             <div className={styles.floatingTutorial}>
@@ -323,6 +343,42 @@ export default function Create({ forcedTitle }: Props) {
             </div>
           </div>
         </Tutorial>
+
+        <Modal isVisible={showGenerate} width={400} height={300}>
+          <div className={styles.publishModal}>
+            <h1 className={styles.tutTitle}>Generate Drawing</h1>
+            <p className={styles.tutSubtitle}>
+              Let's generate your image from text using <i>stable-diffusion</i>.
+              This should take about 5 to 10 seconds.
+            </p>
+            <div>
+              <Input
+                value={generateName}
+                setValue={setGenerateName}
+                placeholder="Art to generate..."
+              />
+            </div>
+            <div className={styles.bottomPublishButtons}>
+              {isLoading ? (
+                <p>Generating...</p>
+              ) : (
+                <>
+                  <Button
+                    name="Close"
+                    isPressed={false}
+                    onClick={updateShowGenerate}
+                  />
+                  <Button
+                    name="Generate"
+                    isPressed={false}
+                    onClick={onGenerate}
+                    disabled={generateName === ""}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </Modal>
 
         <Modal isVisible={showPublish} width={400} height={300}>
           <div className={styles.publishModal}>
@@ -364,8 +420,8 @@ export default function Create({ forcedTitle }: Props) {
           <div className={styles.competitionModal}>
             <h1 className={styles.tutTitle}>McHacks 10 Competition</h1>
             <p className={styles.tutSubtitle}>
-            Join the VizArt competition for McHacks 10! We will showcase the best 
-            drawings of a TREE 🌲 on January 29 at 5PM EST! You only have
+              Join the VizArt competition for McHacks 10! We will showcase the
+              best drawings of a TREE 🌲 on January 29 at 5PM EST! You only have
               60 seconds, but you have unlimited attempts. Get to creating and
               good luck!
             </p>
