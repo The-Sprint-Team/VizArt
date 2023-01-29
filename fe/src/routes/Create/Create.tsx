@@ -39,20 +39,23 @@ const tools: Tool[] = [
 ];
 
 export default function Create() {
-  const ref = useRef<CanvasRef>(null);
-  const start = () => ref.current?.start();
-  const stop = () => ref.current?.stop();
-  const pause = () => ref.current?.pause();
-  const onRecordEnd = (b: Blob, thumb: string) => {
-    api.uploadFile("DEFAULT NAME", b, thumb).then(console.log).catch(console.error);
-  };
-
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
   const [time, setTime] = useState(0);
+  const [isStarted, setIsStarted] = useState(false);
 
   const [actionChange, setActionChange] = useState("");
+
+  const ref = useRef<CanvasRef>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const startRecording = () => ref.current?.start();
+  const stopRecording = () => ref.current?.stop();
+  const onRecordEnd = (b: Blob, thumb: string) => {
+    api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
+  };
+
+  const interval = useRef<NodeJS.Timeout>();
 
   const updateShowTutorial = () => {
     setShowTutorial(!showTutorial);
@@ -64,11 +67,23 @@ export default function Create() {
 
   const onPublish = () => {
     updateShowPublish();
+    //publish
   };
 
-  const onStart = () => {};
+  const onStart = () => {
+    startRecording();
+    setIsStarted(true);
+    interval.current = setInterval(() => {
+      setTime((prev) => prev + 1);
+    }, 1000);
+  };
 
-  const onRestart = () => {};
+  const onRestart = () => {
+    stopRecording();
+    setIsStarted(false);
+    setTime(0);
+    clearInterval(interval.current);
+  };
 
   return (
     <div className={styles.container}>
@@ -92,24 +107,28 @@ export default function Create() {
           onClick={updateShowTutorial}
         />
       </div>
-      {/* 
+
       <div className={styles.canvasContainer}>
+        {time > 0 && time % 2 === 0 && (
+          <div className={styles.recordingCircle} />
+        )}
         <div
           className={styles.actionContainer}
           data-active={actionChange !== ""}
         >
           <p className={styles.action}>{actionChange}</p>
         </div>
-        <div className={styles.canvas}></div>
-      </div> */}
-
-      <CanvasWrapper
-        ref={ref}
-        start={start}
-        stop={stop}
-        pause={pause}
-        onRecordEnd={onRecordEnd}
-      />
+        <div className={styles.canvas} ref={canvasRef}>
+          {canvasRef.current && (
+            <CanvasWrapper
+              width={canvasRef.current.clientWidth}
+              height={canvasRef.current.clientHeight}
+              ref={ref}
+              onRecordEnd={onRecordEnd}
+            />
+          )}
+        </div>
+      </div>
 
       <div className={styles.bottomBar}>
         <Input
@@ -119,8 +138,12 @@ export default function Create() {
         />
         <div className={styles.canvasOptions}>
           <p>{secondsToMinutesSeconds(time)}</p>
-          <Button name="Start" isPressed={false} onClick={onStart} />
-          <Button name="Restart" isPressed={false} onClick={onRestart} />
+          <Button
+            name={isStarted ? "Restart" : "Start"}
+            isPressed={false}
+            onClick={isStarted ? onRestart : onStart}
+            width={100}
+          />
           <Button name="Publish" isPressed={false} onClick={onPublish} />
         </div>
       </div>

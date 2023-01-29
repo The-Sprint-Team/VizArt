@@ -1,5 +1,7 @@
 .container {
-  padding: 30px;
+  padding-top: 30px;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
 .loaderContainer {
@@ -7,4 +9,24 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+.title {
+  font-family: "Open Sans", sans-serif;
+  font-size: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video {
+  border-radius: 5px;
+  /* override other styles to make responsive */
+  width: 100% !important;
+  height: auto !important;
+  margin-bottom: 30px;
+}
+
+.date {
+  font-size: 14px;
 }
