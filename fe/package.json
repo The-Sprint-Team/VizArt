@@ -18,7 +18,6 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "deepai": "^1.0.21",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",
@@ -57,7 +56,6 @@
     ]
   },
   "devDependencies": {
-    "@types/deepai": "^1.0.0",
     "@types/react-modal": "^3.13.1",
     "eslint-config-prettier": "^8.6.0",
     "prettier": "^2.8.3"
