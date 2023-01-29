@@ -1,0 +1,55 @@
+.container {
+  padding: 30px;
+}
+
+.banner {
+  background-color: #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 20px;
+  padding-top: 10px;
+  border-radius: 5px;
+}
+
+.bannerText {
+  font-size: 20px;
+  font-weight: 600;
+  padding: 0;
+  padding-bottom: 5px;
+}
+
+.searchContainer {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.searchTitle {
+  font-size: 28px;
+  font-weight: 600;
+  padding-bottom: 5px;
+}
+
+.loaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.posts {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 30px;
+  flex-flow: column wrap;
+  flex-direction: row;
+}
