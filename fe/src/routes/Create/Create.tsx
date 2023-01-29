@@ -17,7 +17,7 @@ import Input from "../../components/Input/Input";
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import CanvasWrapper from "../../components/CanvasWrapper/CanvasWrapper";
 
-import { Ref as CanvasRef } from "../../components/Canvas/Canvas";
+import { Ref as CanvasRef, Event as EventThing } from "../../components/Canvas/Canvas";
 import api from "../../api";
 import Tutorial from "../../components/Tutorial/Tutorial";
 import TutorialBlock from "../../components/TutorialBlock/TutorialBlock";
@@ -37,11 +37,6 @@ const tools: Tool[] = [
   { name: "Paste", icon: faPaste },
 ];
 
-type Event = {
-  a: Action;
-  d: string;
-};
-
 enum Action {
     None,
     Draw,
@@ -56,7 +51,7 @@ export default function Create() {
   const [time, setTime] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
 
-  const [actionChange, setActionChange] = useState<Event>();
+  const [actionChange, setActionChange] = useState<EventThing>();
 
   const ref = useRef<CanvasRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -66,10 +61,11 @@ export default function Create() {
     api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
   };
 
-  const [onDraw, setOnDraw] = useState<Event>();
-  const [onErase, setOnErase] = useState<Event>();
-  const [onColorPicker, setOnColorPicker] = useState<Event>();
-  const [onNone, setOnNone] = useState<Event>();
+  const [onDraw, setOnDraw] = useState<EventThing>();
+  const [onErase, setOnErase] = useState<EventThing>();
+  const [onColorPicker, setOnColorPicker] = useState<EventThing>();
+  const [onNone, setOnNone] = useState<EventThing>();
+  const [onFkU, setFkU] = useState<EventThing>();
 
   const interval = useRef<NodeJS.Timeout>();
 
@@ -125,6 +121,12 @@ export default function Create() {
     }
   }, [onNone]);
 
+  useEffect(() => {
+    if (onFkU) {
+      setActionChange({ a: onFkU.a, d: onFkU.d });
+    }
+  }, [onFkU]);
+
   return (
     <div className={styles.container}>
       {/* Loop trough tools */}
@@ -165,6 +167,7 @@ export default function Create() {
             onErase={setOnErase}
             onColorPicker={setOnColorPicker}
             onNone={setOnNone}
+            onFkU={setFkU}
             width={800} //canvasRef.current.clientHeight
             height={500}
             ref={ref}
