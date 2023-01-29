@@ -10,15 +10,7 @@
   justify-content: center;
 }
 
-body::-webkit-scrollbar {
-  width: 0;
-}
-body {
-  overflow-y: scroll;
-  padding-right: 17px; /* Add a 17px padding to compensate for the hidden scrollbar */
-}
 .content {
-
   outline: none;
   background-color: #ffffff;
   border-radius: 10px;
@@ -28,6 +20,5 @@ body {
   flex-direction: column;
   align-items: center;
   overflow: auto;
-    
 }
 
