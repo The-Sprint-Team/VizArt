@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import Button from "../../components/Button/Button";
 import Loader from "../../components/Loader/Loader";
@@ -10,6 +10,8 @@ import { convertTime } from "../../utils";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import api, { BASE_URL } from "../../api";
+
+import QRCode from "qrcode";
 
 type PostContent = {
   title: string;
@@ -24,23 +26,22 @@ export default function Share() {
   const uid = location.pathname.split("/")[2];
   const [post, setPost] = useState<PostContent>();
   const [isLoading, setIsLoading] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const navigate = () => {
     navigation("/explore");
   };
 
-  const onShare = () => {
-    //open share dialog on iOS
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Share",
-          text: "Share",
-          url: "https://www.youtube.com/watch?v=Z1BCujX3pw8",
-        })
-        .then(() => console.log("Successful share"))
-        .catch((error) => console.log("Error sharing", error));
-    }
+  const copyLink = () => {
+    const link = BASE_URL.replace("api.", "") + "/explore/" + post?.uid || " ";
+    navigator.clipboard.writeText(link);
+    //turn isCopied to true for 1 second
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -63,6 +64,18 @@ export default function Share() {
       });
   }, []);
 
+  useEffect(() => {
+    if (post) {
+      QRCode.toCanvas(
+        canvasRef.current,
+        // QR code doesn't work with an empty string
+        // so we are using a blank space as a fallback
+        BASE_URL.replace("api.", "") + "/explore/" + post?.uid || " ",
+        (error) => error && console.error(error)
+      );
+    }
+  }, [post]);
+
   return (
     <div className={styles.container}>
       {!isLoading && post ? (
@@ -76,7 +89,16 @@ export default function Share() {
             autoPlay
             muted
             loop
+            controls={true}
           />
+          <div className={styles.share}>
+            <Button
+              name={isCopied ? "Copied!" : "Copy link"}
+              onClick={copyLink}
+              isPressed={false}
+            />
+            <canvas ref={canvasRef} />
+          </div>
         </>
       ) : !isLoading && !post ? (
         <>
