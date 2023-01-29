@@ -42,3 +42,11 @@ export const convertTime = (time: Date) => {
     ampm;
   return strTime;
 };
+
+export const secondsToMinutesSeconds: (seconds: number) => string = (
+  seconds
+) => {
+  let minutes = Math.floor(seconds / 60);
+  seconds = seconds % 60;
+  return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+};

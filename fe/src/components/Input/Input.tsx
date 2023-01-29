@@ -23,6 +23,10 @@ export default function Input({
         onChange={(e) => setValue(e.target.value)}
         value={value}
         placeholder={placeholder}
+        type="text"
+        autoComplete="off"
+        data-lpignore="true"
+        data-form-type="other"
       />
     </div>
   );

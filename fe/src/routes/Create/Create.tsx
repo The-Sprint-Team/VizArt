@@ -8,7 +8,7 @@ import {
   faCopy,
   faPaste,
 } from "@fortawesome/free-solid-svg-icons";
-import { convertTime } from "../../utils";
+import { convertTime, secondsToMinutesSeconds } from "../../utils";
 
 import Modal from "../../components/Modal/Modal";
 import Tool from "../../components/Tool/Tool";
@@ -35,6 +35,7 @@ export default function Create() {
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [time, setTime] = useState(0);
 
   const [actionChange, setActionChange] = useState("");
 
@@ -88,15 +89,13 @@ export default function Create() {
       </div>
 
       <div className={styles.bottomBar}>
-        <div className={styles.artNameContainer}>
-          <Input
-            value={artName}
-            setValue={setArtName}
-            placeholder="Your art name..."
-          />
-        </div>
-        <div className={styles.canvasOption}>
-          <p>{}</p>
+        <Input
+          value={artName}
+          setValue={setArtName}
+          placeholder="Your art name..."
+        />
+        <div className={styles.canvasOptions}>
+          <p>{secondsToMinutesSeconds(time)}</p>
           <Button name="Start" isPressed={false} onClick={start} />
           <Button name="Restart" isPressed={false} onClick={restart} />
           <Button name="Publish" isPressed={false} onClick={publish} />
