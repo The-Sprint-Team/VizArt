@@ -23,7 +23,7 @@ def files_index():
 
 @app.route("/files/<path>")
 def files_get(uid):
-    return send_from_directory('static', fname)
+    return send_from_directory('static', uid)
 
 @app.route("/upload", methods=["POST"])
 def upload():

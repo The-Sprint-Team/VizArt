@@ -5,10 +5,20 @@ import {
   useImperativeHandle,
   ForwardedRef,
 } from "react";
-import { Hands, Results, HAND_CONNECTIONS, NormalizedLandmarkList, Landmark } from "@mediapipe/hands";
+import {
+  Hands,
+  Results,
+  HAND_CONNECTIONS,
+  NormalizedLandmarkList,
+  Landmark,
+} from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
-import { drawLandmarks, drawConnectors, NormalizedLandmark } from "@mediapipe/drawing_utils";
-import "./Canvas.scss";
+import {
+  drawLandmarks,
+  drawConnectors,
+  NormalizedLandmark,
+} from "@mediapipe/drawing_utils";
+import styles from "./style.module.scss";
 
 export interface Props {
   width: number;
@@ -22,43 +32,56 @@ export interface Ref {
   stop: () => void;
 }
 enum Action {
-    Erase,
-    Draw,
-    None
+  Erase,
+  Draw,
+  None,
 }
 
 let points: [[number, number], [number, number]][] = [];
 let prev: any = null;
 
-function distP(p1: [number, number], p2: Landmark, cvs: HTMLCanvasElement): number {
-    console.log(p1, p2)
-    let vec = [p1[0] - p2.x * cvs.width, p1[1] - p2.y * cvs.height];
-    let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
-    return mag;
+function distP(
+  p1: [number, number],
+  p2: Landmark,
+  cvs: HTMLCanvasElement
+): number {
+  console.log(p1, p2);
+  let vec = [p1[0] - p2.x * cvs.width, p1[1] - p2.y * cvs.height];
+  let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
+  return mag;
 }
 
 function dist(l1: Landmark, l2: Landmark): number {
-    let vec = [l1.x - l2.x, l1.y - l2.y];
-    let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
-    return mag;
+  let vec = [l1.x - l2.x, l1.y - l2.y];
+  let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
+  return mag;
 }
 
 function vecNorm(l1: Landmark, l2: Landmark): number[] {
-    let vec = [l1.x - l2.x, l1.y - l2.y];
-    let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
-    return [vec[0] / mag, vec[1] / mag];
+  let vec = [l1.x - l2.x, l1.y - l2.y];
+  let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
+  return [vec[0] / mag, vec[1] / mag];
 }
 
 function ang(v1: number[], v2: number[]): number {
-    return Math.acos(v1[0] * v2[0] + v1[1] * v2[1]);
+  return Math.acos(v1[0] * v2[0] + v1[1] * v2[1]);
 }
 
 function isStraight(hList: NormalizedLandmarkList[], f: number): boolean {
-    const a0 = ang(vecNorm(hList[f][1], hList[f][0]), vecNorm(hList[f][2], hList[f][1]));
-    const a1 = ang(vecNorm(hList[f][2], hList[f][1]), vecNorm(hList[f][3], hList[f][2]));
-    const a2 = ang(vecNorm(hList[f][2], hList[f][1]), vecNorm(hList[f][3], hList[f][2]));
+  const a0 = ang(
+    vecNorm(hList[f][1], hList[f][0]),
+    vecNorm(hList[f][2], hList[f][1])
+  );
+  const a1 = ang(
+    vecNorm(hList[f][2], hList[f][1]),
+    vecNorm(hList[f][3], hList[f][2])
+  );
+  const a2 = ang(
+    vecNorm(hList[f][2], hList[f][1]),
+    vecNorm(hList[f][3], hList[f][2])
+  );
 
-    return Math.abs(a0 - a1) < Math.PI / 15 && Math.abs(a2 - a1) < Math.PI / 15;
+  return Math.abs(a0 - a1) < Math.PI / 15 && Math.abs(a2 - a1) < Math.PI / 15;
 }
 
 function onResults(
@@ -72,51 +95,69 @@ function onResults(
   cx.lineJoin = "round";
   cx.strokeStyle = "black";
   cx.lineWidth = 5;
-    const r: NormalizedLandmarkList[] = [], l: NormalizedLandmarkList[] = [];
+  const r: NormalizedLandmarkList[] = [],
+    l: NormalizedLandmarkList[] = [];
 
-    for (let k in res.multiHandedness) {
-        const h = res.multiHandedness[k];
-        const hList = (h.label === "Right") ? r : l;
-        for (let i = 0; i < 5; ++i) {
-            hList[i] = res.multiHandLandmarks[k].slice(4 * i + 1, 4 * i + 5);
-        }
-
-        // draw finger
-        const d1 = dist(hList[1][3], hList[2][3]);
-        const d2 = dist(hList[2][3], hList[2][0]);
-        if (isStraight(hList, 1) && d1 > d2) {
-            let next: [number, number] = [hList[1][3].x * cvs.width, hList[1][3].y * cvs.height];
-            if (prev) {
-                points.push([prev, next]);
-            }
-            prev = next;
-        } else {
-            prev = null;
-        }
-
-        let radius: number = 40;
-        // erase
-        if (isStraight(hList, 1) && isStraight(hList, 2) && isStraight(hList, 3) && isStraight(hList, 4)) {
-            console.log("JIJIJ")
-            cx.beginPath();
-            cx.arc(hList[2][3].x * cvs.width, hList[2][3].y * cvs.height, radius, 0, 2 * Math.PI);
-            cx.stroke();
-
-            let i = points.length
-            while(i--) {
-                if (distP(points[i][0], hList[2][3], cvs) < radius || distP(points[i][1], hList[2][3], cvs) < radius) {
-                    // console.log("JIJIJ")
-                    points.splice(i, 1);
-                }
-            }
-        }
+  for (let k in res.multiHandedness) {
+    const h = res.multiHandedness[k];
+    const hList = h.label === "Right" ? r : l;
+    for (let i = 0; i < 5; ++i) {
+      hList[i] = res.multiHandLandmarks[k].slice(4 * i + 1, 4 * i + 5);
     }
+
+    // draw finger
+    const d1 = dist(hList[1][3], hList[2][3]);
+    const d2 = dist(hList[2][3], hList[2][0]);
+    if (isStraight(hList, 1) && d1 > d2) {
+      let next: [number, number] = [
+        hList[1][3].x * cvs.width,
+        hList[1][3].y * cvs.height,
+      ];
+      if (prev) {
+        points.push([prev, next]);
+      }
+      prev = next;
+    } else {
+      prev = null;
+    }
+
+    let radius: number = 40;
+    // erase
+    if (
+      isStraight(hList, 1) &&
+      isStraight(hList, 2) &&
+      isStraight(hList, 3) &&
+      isStraight(hList, 4)
+    ) {
+      console.log("JIJIJ");
+      cx.beginPath();
+      cx.arc(
+        hList[2][3].x * cvs.width,
+        hList[2][3].y * cvs.height,
+        radius,
+        0,
+        2 * Math.PI
+      );
+      cx.stroke();
+
+      let i = points.length;
+      while (i--) {
+        if (
+          distP(points[i][0], hList[2][3], cvs) < radius ||
+          distP(points[i][1], hList[2][3], cvs) < radius
+        ) {
+          // console.log("JIJIJ")
+          points.splice(i, 1);
+        }
+      }
+    }
+  }
   // console.log(results)
 
   cx.beginPath();
   for (const seg of points) {
-      cx.moveTo(seg[0][0], seg[0][1]);
-      cx.lineTo(seg[1][0], seg[1][1]);
+    cx.moveTo(seg[0][0], seg[0][1]);
+    cx.lineTo(seg[1][0], seg[1][1]);
   }
   cx.stroke();
 
@@ -207,7 +248,7 @@ function Canvas_(
   }, []);
 
   return (
-    <div className="Canvas">
+    <div className={styles.canvas}>
       <video style={{ display: "none" }} className="input_video" ref={vid} />
       <canvas
         className="output_canvas"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./style.module.scss";
 import {
   faPen,
@@ -15,6 +15,10 @@ import Tool from "../../components/Tool/Tool";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
+import CanvasWrapper from "../../components/CanvasWrapper/CanvasWrapper";
+
+import { Ref as CanvasRef } from "../../components/Canvas/Canvas";
+import api from "../../api";
 
 type Tool = {
   name: string;
@@ -32,6 +36,14 @@ const tools: Tool[] = [
 ];
 
 export default function Create() {
+  const ref = useRef<CanvasRef>(null);
+  const start = () => ref.current?.start();
+  const stop = () => ref.current?.stop();
+  const pause = () => ref.current?.pause();
+  const onRecordEnd = (b: Blob) => {
+    api.uploadFile("DEFAULT NAME", b).then(console.log).catch(console.error);
+  };
+
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
@@ -47,13 +59,13 @@ export default function Create() {
     setShowPublish(!showPublish);
   };
 
-  const publish = () => {
+  const onPublish = () => {
     updateShowPublish();
   };
 
-  const start = () => {};
+  const onStart = () => {};
 
-  const restart = () => {};
+  const onRestart = () => {};
 
   return (
     <div className={styles.container}>
@@ -77,7 +89,7 @@ export default function Create() {
           onClick={updateShowTutorial}
         />
       </div>
-
+      {/* 
       <div className={styles.canvasContainer}>
         <div
           className={styles.actionContainer}
@@ -86,7 +98,15 @@ export default function Create() {
           <p className={styles.action}>{actionChange}</p>
         </div>
         <div className={styles.canvas}></div>
-      </div>
+      </div> */}
+
+      <CanvasWrapper
+        ref={ref}
+        start={start}
+        stop={stop}
+        pause={pause}
+        onRecordEnd={onRecordEnd}
+      />
 
       <div className={styles.bottomBar}>
         <Input
@@ -96,9 +116,9 @@ export default function Create() {
         />
         <div className={styles.canvasOptions}>
           <p>{secondsToMinutesSeconds(time)}</p>
-          <Button name="Start" isPressed={false} onClick={start} />
-          <Button name="Restart" isPressed={false} onClick={restart} />
-          <Button name="Publish" isPressed={false} onClick={publish} />
+          <Button name="Start" isPressed={false} onClick={onStart} />
+          <Button name="Restart" isPressed={false} onClick={onRestart} />
+          <Button name="Publish" isPressed={false} onClick={onPublish} />
         </div>
       </div>
       <Modal isVisible={showTutorial} width={300} height={400}>
