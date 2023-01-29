@@ -7,24 +7,20 @@ type Event = {
 };
 
 enum Action {
-  StartErase,
-  StopErase,
-  StartDraw,
-  StopDraw,
-  StartColorPicker,
-  StopColorPicker,
+    None,
+    Draw,
+    Erase,
+    ColorPicker,
 }
 
 type Props = {
   width: number;
   height: number;
   onRecordEnd: CanvasProps["onRecordEnd"];
-  onStartDraw: (e: Event) => void;
-  onStopDraw: (e: Event) => void;
-  onStartErase: (e: Event) => void;
-  onStopErase: (e: Event) => void;
-  onStartColorPicker: (e: Event) => void;
-  onStopColorPicker: (e: Event) => void;
+  onDraw: (e: Event) => void;
+  onErase: (e: Event) => void;
+  onColorPicker: (e: Event) => void;
+  onNone: (e: Event) => void;
 };
 
 function CanvasWrapper_(
@@ -32,24 +28,20 @@ function CanvasWrapper_(
     width,
     height,
     onRecordEnd,
-    onStartDraw,
-    onStopDraw,
-    onStartErase,
-    onStopErase,
-    onStartColorPicker,
-    onStopColorPicker,
+    onDraw,
+    onErase,
+    onColorPicker,
+    onNone,
   }: Props,
   ref: ForwardedRef<Ref>
 ) {
   return (
     <div>
       <Canvas
-        onStartDraw={onStartDraw}
-        onStopDraw={onStopDraw}
-        onStartErase={onStartErase}
-        onStopErase={onStopErase}
-        onStartColorPicker={onStartColorPicker}
-        onStopColorPicker={onStopColorPicker}
+        onDraw={onDraw}
+        onErase={onErase}
+        onColorPicker={onColorPicker}
+        onNone={onNone}
         width={width}
         height={height}
         {...{ ref, onRecordEnd }}

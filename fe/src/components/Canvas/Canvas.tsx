@@ -1,3 +1,4 @@
+// TODO: FIX FRONTEND ONLY SHOWING CANVAS IF POSE IN FRAME
 import {
     useRef,
     useEffect,
@@ -24,12 +25,10 @@ export interface Props {
     width: number;
     height: number;
     onRecordEnd?: (vid: Blob, b64thumb: string) => any;
-    onStartDraw: (e: Event) => void;
-    onStopDraw: (e: Event) => void;
-    onStartErase: (e: Event) => void;
-    onStopErase: (e: Event) => void;
-    onStartColorPicker: (e: Event) => void;
-    onStopColorPicker: (e: Event) => void;
+    onDraw: (e: Event) => void;
+    onErase: (e: Event) => void;
+    onColorPicker: (e: Event) => void;
+    onNone: (e: Event) => void;
 }
 
 export interface Ref {
@@ -44,12 +43,10 @@ type Event = {
 }
 
 enum Action {
-    StartErase,
-    StopErase,
-    StartDraw,
-    StopDraw,
-    StartColorPicker,
-    StopColorPicker,
+    None,
+    Draw,
+    Erase,
+    ColorPicker,
 }
 
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]
@@ -92,12 +89,10 @@ function onResults(
     cx: CanvasRenderingContext2D,
     cvs: HTMLCanvasElement,
     res: Results,
-    onStartDraw: (e: Event) => void,
-    onStopDraw: (e: Event) => void,
-    onStartErase: (e: Event) => void,
-    onStopErase: (e: Event) => void,
-    onStartColorPicker: (e: Event) => void,
-    onStopColorPicker: (e: Event) => void,
+    onDraw: (e: Event) => void,
+    onErase: (e: Event) => void,
+    onColorPicker: (e: Event) => void,
+    onNone: (e: Event) => void,
 ) {
     cx.restore();
     cx.clearRect(0, 0, cvs.width, cvs.height);
@@ -117,8 +112,10 @@ function onResults(
         // draw finger
         const d1 = dist(hList[1][3], hList[2][3]);
         const d2 = dist(hList[2][3], hList[2][0]);
+        let draw = false, erase = false, colorPicker = false;
         if (isStraight(hList, 1, Math.PI / 15) && d1 > d2) {
-            onStartDraw({ a: Action.StartDraw, d: "" });
+            onDraw({ a: Action.Draw, d: "" });
+            draw = true;
             let next: [number, number] = [hList[1][3].x * cvs.width, hList[1][3].y * cvs.height];
             if (h.label === "Right") {
                 if (prevR) {
@@ -133,7 +130,6 @@ function onResults(
                 prevL = next;
             }
         } else {
-            onStopDraw({ a: Action.StopDraw, d: "" });
             if (h.label === "Right") { prevR = null; }
             if (h.label === "Left") { prevL = null; }
         }
@@ -147,7 +143,8 @@ function onResults(
             if (hList[i][3].y > hList[i][2].y) { allAbove = false; }
         }
         if (allStraight && allAbove) {
-            onStartErase({ a: Action.StartErase, d: "" });
+            onErase({ a: Action.Erase, d: "" });
+            erase = true;
             cx.beginPath();
             cx.arc(hList[2][3].x * cvs.width, hList[2][3].y * cvs.height, radius, 0, 2 * Math.PI);
             cx.stroke();
@@ -158,7 +155,7 @@ function onResults(
                     points.splice(i, 1);
                 }
             }
-        } else { onStopErase({ a: Action.StopErase, d: "" }); }
+        }
 
         // color picker
         const dc1 = dist(hList[1][3], hList[0][3]);
@@ -183,6 +180,8 @@ function onResults(
         const he = Math.abs(bot - top);
 
         if ((dc1 < dc2 || dc1 < dc3) && (wi > 1 && he > 1)) {
+            onColorPicker({ a: Action.ColorPicker, d: color });
+            colorPicker = true;
             cx.strokeStyle = "black";
             cx.strokeRect(left - 2, top + 2, wi + 4, he + 4);
             const imageData = cx.getImageData(left, top, wi, he);
@@ -199,11 +198,10 @@ function onResults(
             const b = bSum * 4 / l;
             const a = aSum * 4 / l;
             color = `rgba(${r}, ${g}, ${b}, ${a})`;
-            onStartColorPicker({ a: Action.StartColorPicker, d: color });
-        } else { onStopColorPicker({ a: Action.StopColorPicker, d: color }); }
+        }
+        if (!draw && !erase && !colorPicker) { onNone({ a: Action.None, d: "" }); }
 
         // draw
-        console.log(points);
         for (const seg of points) {
             cx.strokeStyle = seg[2];
             cx.beginPath();
@@ -211,7 +209,6 @@ function onResults(
             cx.lineTo(seg[1][0], seg[1][1]);
             cx.stroke()
         }
-        // cx.stroke();
 
         if (res.multiHandLandmarks) {
             for (const landmarks of res.multiHandLandmarks) {
@@ -227,7 +224,7 @@ function onResults(
 }
 
 function Canvas_(
-    { width, height, onRecordEnd, onStartDraw, onStopDraw, onStartErase, onStopErase, onStartColorPicker, onStopColorPicker }: Readonly<Props>,
+    { width, height, onRecordEnd, onDraw, onErase, onColorPicker, onNone }: Readonly<Props>,
     ref: ForwardedRef<Ref>
 ) {
     const cvs = useRef<HTMLCanvasElement | null>(null);
@@ -277,7 +274,7 @@ function Canvas_(
 
         hands.current!.onResults((r) => {
             if (cx.current && cvs.current) {
-                onResults(cx.current, cvs.current, r, onStartDraw, onStopDraw, onStartErase, onStopErase, onStartColorPicker, onStopColorPicker);
+                onResults(cx.current, cvs.current, r, onDraw, onErase, onColorPicker, onNone);
             }
         });
 

@@ -43,12 +43,10 @@ type Event = {
 };
 
 enum Action {
-  StartErase,
-  StopErase,
-  StartDraw,
-  StopDraw,
-  StartColorPicker,
-  StopColorPicker,
+    None,
+    Draw,
+    Erase,
+    ColorPicker,
 }
 
 export default function Create() {
@@ -68,12 +66,10 @@ export default function Create() {
     api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
   };
 
-  const [onStartDraw, setOnStartDraw] = useState<Event>();
-  const [onStopDraw, setOnStopDraw] = useState<Event>();
-  const [onStartErase, setOnStartErase] = useState<Event>();
-  const [onStopErase, setOnStopErase] = useState<Event>();
-  const [onStartColorPicker, setOnStartColorPicker] = useState<Event>();
-  const [onStopColorPicker, setOnStopColorPicker] = useState<Event>();
+  const [onDraw, setOnDraw] = useState<Event>();
+  const [onErase, setOnErase] = useState<Event>();
+  const [onColorPicker, setOnColorPicker] = useState<Event>();
+  const [onNone, setOnNone] = useState<Event>();
 
   const interval = useRef<NodeJS.Timeout>();
 
@@ -106,40 +102,28 @@ export default function Create() {
   };
 
   useEffect(() => {
-    if (onStartDraw) {
-      setActionChange({ a: onStartDraw.a, d: onStartDraw.d });
+    if (onDraw) {
+      setActionChange({ a: onDraw.a, d: onDraw.d });
     }
-  }, [onStartDraw]);
+  }, [onDraw]);
 
   useEffect(() => {
-    if (onStopDraw) {
-      setActionChange({ a: onStopDraw.a, d: onStopDraw.d });
+    if (onErase) {
+      setActionChange({ a: onErase.a, d: onErase.d });
     }
-  }, [onStopDraw]);
+  }, [onErase]);
 
   useEffect(() => {
-    if (onStartErase) {
-      setActionChange({ a: onStartErase.a, d: onStartErase.d });
+    if (onColorPicker) {
+      setActionChange({ a: onColorPicker.a, d: onColorPicker.d });
     }
-  }, [onStartErase]);
+  }, [onColorPicker]);
 
   useEffect(() => {
-    if (onStopErase) {
-      setActionChange({ a: onStopErase.a, d: onStopErase.d });
+    if (onNone) {
+      setActionChange({ a: onNone.a, d: onNone.d });
     }
-  }, [onStopErase]);
-
-  useEffect(() => {
-    if (onStartColorPicker) {
-      setActionChange({ a: onStartColorPicker.a, d: onStartColorPicker.d });
-    }
-  }, [onStartColorPicker]);
-
-  useEffect(() => {
-    // if (onStartDraw?.e) {
-    //   setActionChange({ a: onStartDraw.e.a, d: onStartDraw.e.d });
-    // }
-  }, [onStopColorPicker]);
+  }, [onNone]);
 
   return (
     <div className={styles.container}>
@@ -177,12 +161,10 @@ export default function Create() {
         <div className={styles.canvas} ref={canvasRef}>
           {/* {canvasRef.current && ( */}
           <CanvasWrapper
-            onStartDraw={setOnStartDraw}
-            onStopDraw={setOnStopDraw}
-            onStartErase={setOnStartErase}
-            onStopErase={setOnStopErase}
-            onStartColorPicker={setOnStartColorPicker}
-            onStopColorPicker={setOnStopColorPicker}
+            onDraw={setOnDraw}
+            onErase={setOnErase}
+            onColorPicker={setOnColorPicker}
+            onNone={setOnNone}
             width={800} //canvasRef.current.clientHeight
             height={500}
             ref={ref}
