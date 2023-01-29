@@ -19,6 +19,9 @@ import CanvasWrapper from "../../components/CanvasWrapper/CanvasWrapper";
 
 import { Ref as CanvasRef } from "../../components/Canvas/Canvas";
 import api from "../../api";
+import Tutorial from "../../components/Tutorial/Tutorial";
+import TutorialBlock from "../../components/TutorialBlock/TutorialBlock";
+
 
 type Tool = {
   name: string;
@@ -36,20 +39,23 @@ const tools: Tool[] = [
 ];
 
 export default function Create() {
-  const ref = useRef<CanvasRef>(null);
-  const start = () => ref.current?.start();
-  const stop = () => ref.current?.stop();
-  const pause = () => ref.current?.pause();
-  const onRecordEnd = (b: Blob) => {
-    api.uploadFile("DEFAULT NAME", b).then(console.log).catch(console.error);
-  };
-
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
   const [time, setTime] = useState(0);
+  const [isStarted, setIsStarted] = useState(false);
 
   const [actionChange, setActionChange] = useState("");
+
+  const ref = useRef<CanvasRef>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const startRecording = () => ref.current?.start();
+  const stopRecording = () => ref.current?.stop();
+  const onRecordEnd = (b: Blob, thumb: string) => {
+    api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
+  };
+
+  const interval = useRef<NodeJS.Timeout>();
 
   const updateShowTutorial = () => {
     setShowTutorial(!showTutorial);
@@ -61,11 +67,23 @@ export default function Create() {
 
   const onPublish = () => {
     updateShowPublish();
+    //publish
   };
 
-  const onStart = () => {};
+  const onStart = () => {
+    startRecording();
+    setIsStarted(true);
+    interval.current = setInterval(() => {
+      setTime((prev) => prev + 1);
+    }, 1000);
+  };
 
-  const onRestart = () => {};
+  const onRestart = () => {
+    stopRecording();
+    setIsStarted(false);
+    setTime(0);
+    clearInterval(interval.current);
+  };
 
   return (
     <div className={styles.container}>
@@ -89,24 +107,28 @@ export default function Create() {
           onClick={updateShowTutorial}
         />
       </div>
-      {/* 
+
       <div className={styles.canvasContainer}>
+        {time > 0 && time % 2 === 0 && (
+          <div className={styles.recordingCircle} />
+        )}
         <div
           className={styles.actionContainer}
           data-active={actionChange !== ""}
         >
           <p className={styles.action}>{actionChange}</p>
         </div>
-        <div className={styles.canvas}></div>
-      </div> */}
-
-      <CanvasWrapper
-        ref={ref}
-        start={start}
-        stop={stop}
-        pause={pause}
-        onRecordEnd={onRecordEnd}
-      />
+        <div className={styles.canvas} ref={canvasRef}>
+          {canvasRef.current && (
+            <CanvasWrapper
+              width={canvasRef.current.clientWidth}
+              height={canvasRef.current.clientHeight}
+              ref={ref}
+              onRecordEnd={onRecordEnd}
+            />
+          )}
+        </div>
+      </div>
 
       <div className={styles.bottomBar}>
         <Input
@@ -116,18 +138,30 @@ export default function Create() {
         />
         <div className={styles.canvasOptions}>
           <p>{secondsToMinutesSeconds(time)}</p>
-          <Button name="Start" isPressed={false} onClick={onStart} />
-          <Button name="Restart" isPressed={false} onClick={onRestart} />
+          <Button
+            name={isStarted ? "Restart" : "Start"}
+            isPressed={false}
+            onClick={isStarted ? onRestart : onStart}
+            width={100}
+          />
           <Button name="Publish" isPressed={false} onClick={onPublish} />
         </div>
       </div>
-      <Modal isVisible={showTutorial} width={300} height={400}>
+
+      <Tutorial isVisible={showTutorial} width={1000} height={800}>
         <>
-          <h1>This is a test</h1>
-          <p>Put all the content you want in here</p>
+          <h1>Tutorial</h1>
           <Button name="Close" isPressed={false} onClick={updateShowTutorial} />
+          <h2> Learn to draw in the air</h2>  
+          <TutorialBlock title="Draw" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Erase" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Color Pick" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Copy" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Paste" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Record" description="draw with your finger tip" image="" />
         </>
-      </Modal>
+      </Tutorial>
+      
       <Modal isVisible={showPublish} width={400} height={400}>
         <>
           <h1>This is a publish</h1>

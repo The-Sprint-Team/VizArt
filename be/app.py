@@ -1,6 +1,8 @@
 import os
 import random
 import string
+import base64
+from datetime import datetime
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 
@@ -11,35 +13,56 @@ CORS(app)
 app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__name__), "static")
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-# Insanely scalable database.
-db = {}
 
 def genname(k=8) -> str:
-    return ''.join(random.choices(string.ascii_letters, k=k))
+    return "".join(random.choices(string.ascii_letters, k=k))
 
-@app.route("/files", methods=["GET"])
+
+def fileinfo(uid: str):
+    base = os.path.join(app.config["UPLOAD_FOLDER"], uid)
+    time = datetime.fromtimestamp(os.path.getmtime(base))
+    with open(os.path.join(base, "name.txt"), "r") as f:
+        name = f.read()
+    return {
+        "name": name,
+        "vid": os.path.join(base, "vid.webm"),
+        "thumb": os.path.join(base, "thumb.png"),
+        "time": time.astimezone().isoformat(),
+    }
+
+
+@app.route("/videos", methods=["GET"])
 def files_index():
-    return db
+    base = app.config["UPLOAD_FOLDER"]
+    return {k: fileinfo(k) for k in os.listdir(base)}
 
-@app.route("/files/<path>")
-def files_get(uid):
-    return send_from_directory('static', uid)
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    if 'file' not in request.files:
-        return 'No file provided', 400
+    if "file" not in request.files:
+        return "No file provided", 400
 
-    if 'name' not in request.form:
-        return 'No name provided', 400
+    if "thumb" not in request.form:
+        return "Thumbnail not provided", 400
 
-    name = request.form['name']
-    file = request.files['file']
+    if "name" not in request.form:
+        return "No name provided", 400
+
+    file = request.files["file"]
+    name = request.form["name"]
+    thumb = request.form["thumb"]
+
     uid = genname()
-    fname = f'{uid}.webm'
-    file.save(os.path.join(app.config["UPLOAD_FOLDER"], fname))
+    path = os.path.join(app.config["UPLOAD_FOLDER"], uid)
 
-    db[uid] = name
+    os.makedirs(path, exist_ok=True)
+    file.save(os.path.join(path, "vid.webm"))
 
-    print(db)
-    return {'uid': uid}
+    with open(os.path.join(path, "thumb.png"), "wb") as f:
+        buf = base64.b64decode(thumb)
+        f.write(buf)
+
+    with open(os.path.join(path, "name.txt"), "w") as f:
+        f.write(name)
+
+    return {"uid": uid}
