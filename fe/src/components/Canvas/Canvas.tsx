@@ -52,9 +52,16 @@ let prevR: any = null;
 let prevL: any = null;
 let cp: boolean = false,
   cpm: boolean = false,
-  cpmm: boolean = false,
-  fku: boolean = false;
+  cpmm: boolean = false;
 let color: string = "black";
+let left = 5000,
+  right = 0,
+  top = 5000,
+  bot = 0;
+let draw = false,
+  erase = false,
+  colorPicker = false,
+  fku: boolean = false;
 
 function distP(
   p1: [number, number],
@@ -201,12 +208,12 @@ function onResults(
   const r: NormalizedLandmarkList[] = [],
     l: NormalizedLandmarkList[] = [];
 
-  let draw = false,
-    erase = false,
-    colorPicker = false;
   if (res.multiHandedness.length === 0) {
     prevR = null;
     prevL = null;
+    if (!draw && !erase && !colorPicker && !fku) {
+      onActionChange({ a: Action.None, d: "" });
+    }
   }
   for (let k in res.multiHandedness) {
     const h = res.multiHandedness[k];
@@ -223,6 +230,7 @@ function onResults(
       !isPerp(hList[1][2], hList[1][3], hList[4][2], hList[4][3])
     ) {
       onActionChange({ a: Action.Pen, d: "" });
+      draw = true;
       let next: [number, number] = [
         hList[1][3].x * cvs.width,
         hList[1][3].y * cvs.height,
@@ -331,7 +339,7 @@ function onResults(
       color = `rgba(${r}, ${g}, ${b}, ${a})`;
     }
 
-    //fk u
+    // fk u
     if (
       isStraight(hList, 2, Math.PI / 15) &&
       !isPerp(hList[2][2], hList[2][3], hList[1][2], hList[1][3]) &&
@@ -347,6 +355,10 @@ function onResults(
     if (!draw && !erase && !colorPicker && !fku) {
       onActionChange({ a: Action.None, d: "" });
     }
+    draw = false;
+    erase = false;
+    colorPicker = false;
+    fku = false;
   }
 
   // copy paste
@@ -354,7 +366,7 @@ function onResults(
     // let r = res.multiHandedness[0].label === "Right" ? 0 : 1;
     // let l = 1 - r;
     const eps1 = 0.01;
-    const eps2 = 0.05;
+    const eps2 = 0.04;
     const eps3 = 0.1;
     let dc = dist(res.multiHandLandmarks[0][8], res.multiHandLandmarks[1][8]);
     let dc1 = dist(
@@ -371,38 +383,37 @@ function onResults(
       cpm = true;
     }
     // console.log(cp, cpm);
-    // let left = [5000, 5000], right = [0, 0], top = [0, 0], bot = [5000, 5000];
     if (cp && cpm && dc < eps1) {
-      // for (const seg of points) {
-      //     if (seg[2] === "orange") {
-      //         let left = seg[0][0] * cvs.width;
-      //         let right = seg[] * cvs.width;
-      //         left = (left + (left_ + right) / 2) / 2;
-      //         right = (right + (left_ + right) / 2) / 2;
-      //         left_ = left;
-      //         left = (left + (left_ + right) / 2) / 2;
-      //         right = (right + (left_ + right) / 2) / 2;
-      //         const wi = Math.abs(right - left);
-      //         let top = hList[1][1].y * cvs.height;
-      //         let top_ = top;
-      //         let bot = hList[0][1].y * cvs.height;
-      //         top = (top + (top_ + bot) / 2) / 2;
-      //         bot = (bot + (top_ + bot) / 2) / 2;
-      //         top_ = top;
-      //         const he = Math.abs(bot - top);
-      //         }
-      //     cx.strokeStyle = seg[2];
-      //     cx.beginPath();
-      //     cx.moveTo(seg[0][0], seg[0][1]);
-      //     cx.lineTo(seg[1][0], seg[1][1]);
-      //     cx.stroke()
-      // }
+      for (const seg of points) {
+        if (seg[2] === "cyan") {
+          // console.log(seg[0][0]);
+          left = Math.min(left, seg[0][0]);
+          left = Math.min(left, seg[1][0]);
+          right = Math.max(right, seg[0][0]);
+          right = Math.max(right, seg[1][0]);
+          top = Math.min(top, seg[0][1]);
+          top = Math.min(top, seg[1][1]);
+          bot = Math.max(bot, seg[0][1]);
+          bot = Math.max(bot, seg[1][1]);
+        }
+      }
       cpmm = true;
     }
+    if (cpm && cpmm) {
+      cx.strokeStyle = "cyan";
+      cx.strokeRect(left, top, Math.abs(right - left), Math.abs(top - bot));
+      cx.stroke();
+    }
+    console.log(left, right, top, bot);
     if (cp && cpm && cpmm && dc > eps2) {
+      console.log(left, right, top, bot);
       cp = false;
       cpm = false;
       cpmm = false;
+      left = 5000;
+      right = 0;
+      top = 5000;
+      bot = 0;
     }
   }
 
@@ -510,7 +521,11 @@ function Canvas_(
 
   return (
     <div className={styles.container}>
-      <video style={{ display: "none", borderRadius: "5px" }} ref={vid} />
+      <video
+        style={{ display: "none", borderRadius: 5 }}
+        className="input_video"
+        ref={vid}
+      />
       <canvas
         className={styles.canvas}
         width={`${width}px`}
