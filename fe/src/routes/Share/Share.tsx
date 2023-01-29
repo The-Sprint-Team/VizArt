@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 import Button from "../../components/Button/Button";
 import Loader from "../../components/Loader/Loader";
+import SizeCap from "../../components/SizeCap/SizeCap";
 
 import styles from "./style.module.scss";
 
@@ -93,6 +94,17 @@ export default function Share() {
           >
             <source src={post.video} type="video/webm" />
           </video>
+          <SizeCap
+            width={700}
+            alternate={
+              <p>
+                Note: Videos may not work on mobile devices. Please view them on
+                your laptop.
+              </p>
+            }
+          >
+            <></>
+          </SizeCap>
           <div className={styles.share}>
             <Button
               name={isCopied ? "Copied!" : "Copy link"}
