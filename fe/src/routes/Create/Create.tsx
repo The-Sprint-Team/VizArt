@@ -22,7 +22,6 @@ import api from "../../api";
 import Tutorial from "../../components/Tutorial/Tutorial";
 import TutorialBlock from "../../components/TutorialBlock/TutorialBlock";
 
-
 type Tool = {
   name: string;
   icon: FontAwesomeIconProps["icon"];
@@ -38,6 +37,20 @@ const tools: Tool[] = [
   { name: "Paste", icon: faPaste },
 ];
 
+type Event = {
+  a: Action;
+  d: string;
+};
+
+enum Action {
+  StartErase,
+  StopErase,
+  StartDraw,
+  StopDraw,
+  StartColorPicker,
+  StopColorPicker,
+}
+
 export default function Create() {
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
@@ -45,7 +58,7 @@ export default function Create() {
   const [time, setTime] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
 
-  const [actionChange, setActionChange] = useState("");
+  const [actionChange, setActionChange] = useState<Event>();
 
   const ref = useRef<CanvasRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -54,6 +67,13 @@ export default function Create() {
   const onRecordEnd = (b: Blob, thumb: string) => {
     api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
   };
+
+  const [onStartDraw, setOnStartDraw] = useState<Event>();
+  const [onStopDraw, setOnStopDraw] = useState<Event>();
+  const [onStartErase, setOnStartErase] = useState<Event>();
+  const [onStopErase, setOnStopErase] = useState<Event>();
+  const [onStartColorPicker, setOnStartColorPicker] = useState<Event>();
+  const [onStopColorPicker, setOnStopColorPicker] = useState<Event>();
 
   const interval = useRef<NodeJS.Timeout>();
 
@@ -85,6 +105,42 @@ export default function Create() {
     clearInterval(interval.current);
   };
 
+  useEffect(() => {
+    if (onStartDraw) {
+      setActionChange({ a: onStartDraw.a, d: onStartDraw.d });
+    }
+  }, [onStartDraw]);
+
+  useEffect(() => {
+    if (onStopDraw) {
+      setActionChange({ a: onStopDraw.a, d: onStopDraw.d });
+    }
+  }, [onStopDraw]);
+
+  useEffect(() => {
+    if (onStartErase) {
+      setActionChange({ a: onStartErase.a, d: onStartErase.d });
+    }
+  }, [onStartErase]);
+
+  useEffect(() => {
+    if (onStopErase) {
+      setActionChange({ a: onStopErase.a, d: onStopErase.d });
+    }
+  }, [onStopErase]);
+
+  useEffect(() => {
+    if (onStartColorPicker) {
+      setActionChange({ a: onStartColorPicker.a, d: onStartColorPicker.d });
+    }
+  }, [onStartColorPicker]);
+
+  useEffect(() => {
+    // if (onStartDraw?.e) {
+    //   setActionChange({ a: onStartDraw.e.a, d: onStartDraw.e.d });
+    // }
+  }, [onStopColorPicker]);
+
   return (
     <div className={styles.container}>
       {/* Loop trough tools */}
@@ -114,19 +170,25 @@ export default function Create() {
         )}
         <div
           className={styles.actionContainer}
-          data-active={actionChange !== ""}
+          // data-active={actionChange !== ""}
         >
-          <p className={styles.action}>{actionChange}</p>
+          <h1 className={styles.action}>{actionChange?.a.toString()}</h1>
         </div>
         <div className={styles.canvas} ref={canvasRef}>
-          {canvasRef.current && (
-            <CanvasWrapper
-              width={canvasRef.current.clientWidth}
-              height={canvasRef.current.clientHeight}
-              ref={ref}
-              onRecordEnd={onRecordEnd}
-            />
-          )}
+          {/* {canvasRef.current && ( */}
+          <CanvasWrapper
+            onStartDraw={setOnStartDraw}
+            onStopDraw={setOnStopDraw}
+            onStartErase={setOnStartErase}
+            onStopErase={setOnStopErase}
+            onStartColorPicker={setOnStartColorPicker}
+            onStopColorPicker={setOnStopColorPicker}
+            width={800} //canvasRef.current.clientHeight
+            height={500}
+            ref={ref}
+            onRecordEnd={onRecordEnd}
+          />
+          {/* )} */}
         </div>
       </div>
 
@@ -152,16 +214,40 @@ export default function Create() {
         <>
           <h1>Tutorial</h1>
           <Button name="Close" isPressed={false} onClick={updateShowTutorial} />
-          <h2> Learn to draw in the air</h2>  
-          <TutorialBlock title="Draw" description="draw with your finger tip" image="" />
-          <TutorialBlock title="Erase" description="draw with your finger tip" image="" />
-          <TutorialBlock title="Color Pick" description="draw with your finger tip" image="" />
-          <TutorialBlock title="Copy" description="draw with your finger tip" image="" />
-          <TutorialBlock title="Paste" description="draw with your finger tip" image="" />
-          <TutorialBlock title="Record" description="draw with your finger tip" image="" />
+          <h2> Learn to draw in the air</h2>
+          <TutorialBlock
+            title="Draw"
+            description="draw with your finger tip"
+            image=""
+          />
+          <TutorialBlock
+            title="Erase"
+            description="draw with your finger tip"
+            image=""
+          />
+          <TutorialBlock
+            title="Color Pick"
+            description="draw with your finger tip"
+            image=""
+          />
+          <TutorialBlock
+            title="Copy"
+            description="draw with your finger tip"
+            image=""
+          />
+          <TutorialBlock
+            title="Paste"
+            description="draw with your finger tip"
+            image=""
+          />
+          <TutorialBlock
+            title="Record"
+            description="draw with your finger tip"
+            image=""
+          />
         </>
       </Tutorial>
-      
+
       <Modal isVisible={showPublish} width={400} height={400}>
         <>
           <h1>This is a publish</h1>
