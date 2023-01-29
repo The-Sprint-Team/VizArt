@@ -15,9 +15,12 @@ import Tool from "../../components/Tool/Tool";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
-import CanvasWrapper from "../../components/CanvasWrapper/CanvasWrapper";
+import CanvasWrapper, {
+  Ref as CanvasRef,
+  ActionChange,
+  Action,
+} from "../../components/CanvasWrapper/CanvasWrapper";
 
-import { Ref as CanvasRef } from "../../components/Canvas/Canvas";
 import api from "../../api";
 import Tutorial from "../../components/Tutorial/Tutorial";
 import TutorialBlock from "../../components/TutorialBlock/TutorialBlock";
@@ -37,26 +40,16 @@ const tools: Tool[] = [
   { name: "Paste", icon: faPaste },
 ];
 
-type Event = {
-  a: Action;
-  d: string;
-};
-
-enum Action {
-    None,
-    Draw,
-    Erase,
-    ColorPicker,
-}
-
 export default function Create() {
   const [artName, setArtName] = useState(convertTime(new Date()));
   const [showTutorial, setShowTutorial] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
   const [time, setTime] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
-
-  const [actionChange, setActionChange] = useState<Event>();
+  const [actionChange, setActionChange] = useState<ActionChange>({
+    a: Action.None,
+    d: "",
+  });
 
   const ref = useRef<CanvasRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -66,12 +59,7 @@ export default function Create() {
     api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
   };
 
-  const [onDraw, setOnDraw] = useState<Event>();
-  const [onErase, setOnErase] = useState<Event>();
-  const [onColorPicker, setOnColorPicker] = useState<Event>();
-  const [onNone, setOnNone] = useState<Event>();
-
-  const interval = useRef<NodeJS.Timeout>();
+  const interval = useRef<NodeJS.Timer>();
 
   const updateShowTutorial = () => {
     setShowTutorial(!showTutorial);
@@ -101,29 +89,9 @@ export default function Create() {
     clearInterval(interval.current);
   };
 
-  useEffect(() => {
-    if (onDraw) {
-      setActionChange({ a: onDraw.a, d: onDraw.d });
-    }
-  }, [onDraw]);
-
-  useEffect(() => {
-    if (onErase) {
-      setActionChange({ a: onErase.a, d: onErase.d });
-    }
-  }, [onErase]);
-
-  useEffect(() => {
-    if (onColorPicker) {
-      setActionChange({ a: onColorPicker.a, d: onColorPicker.d });
-    }
-  }, [onColorPicker]);
-
-  useEffect(() => {
-    if (onNone) {
-      setActionChange({ a: onNone.a, d: onNone.d });
-    }
-  }, [onNone]);
+  const onActionChange = (e: ActionChange) => {
+    setActionChange(e);
+  };
 
   return (
     <div className={styles.container}>
@@ -135,7 +103,7 @@ export default function Create() {
               <Tool
                 name={tool.name}
                 icon={tool.icon}
-                isActive={false}
+                isActive={tool.name === actionChange.a}
                 key={index}
               />
             );
@@ -152,25 +120,14 @@ export default function Create() {
         {time > 0 && time % 2 === 0 && (
           <div className={styles.recordingCircle} />
         )}
-        <div
-          className={styles.actionContainer}
-          // data-active={actionChange !== ""}
-        >
-          <h1 className={styles.action}>{actionChange?.a.toString()}</h1>
-        </div>
         <div className={styles.canvas} ref={canvasRef}>
-          {/* {canvasRef.current && ( */}
           <CanvasWrapper
-            onDraw={setOnDraw}
-            onErase={setOnErase}
-            onColorPicker={setOnColorPicker}
-            onNone={setOnNone}
+            onActionChange={onActionChange}
             width={800} //canvasRef.current.clientHeight
             height={500}
             ref={ref}
             onRecordEnd={onRecordEnd}
           />
-          {/* )} */}
         </div>
       </div>
 

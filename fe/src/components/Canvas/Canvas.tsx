@@ -1,4 +1,4 @@
-// TODO: FIX FRONTEND ONLY SHOWING CANVAS IF POSE IN FRAME
+// TODO: COPY PASTE
 import {
     useRef,
     useEffect,
@@ -25,10 +25,7 @@ export interface Props {
     width: number;
     height: number;
     onRecordEnd?: (vid: Blob, b64thumb: string) => any;
-    onDraw: (e: Event) => void;
-    onErase: (e: Event) => void;
-    onColorPicker: (e: Event) => void;
-    onNone: (e: Event) => void;
+    onActionChange: (e: ActionChange) => any;
 }
 
 export interface Ref {
@@ -37,21 +34,23 @@ export interface Ref {
     stop: () => void;
 }
 
-type Event = {
+export type ActionChange = {
     a: Action,
     d: string
 }
 
-enum Action {
-    None,
-    Draw,
-    Erase,
-    ColorPicker,
+export enum Action {
+    None = "None",
+    Pen = "Pen",
+    Eraser = "Eraser",
+    Color = "Color",
+    Clear = "Clear",
 }
 
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]
 let prevR: any = null;
 let prevL: any = null;
+let cp: boolean = false, cpm: boolean = false, cpmm: boolean = false, fku: boolean = false;
 let color: string = "black";
 
 function distP(p1: [number, number], p2: NormalizedLandmark, cvs: HTMLCanvasElement): number {
@@ -85,23 +84,61 @@ function isStraight(hList: NormalizedLandmarkList[], f: number, bar: number): bo
     return Math.abs(a0 - a1) < bar && Math.abs(a2 - a1) < bar;
 }
 
+function isPerp(l11: NormalizedLandmark, l12: NormalizedLandmark, l21: NormalizedLandmark, l22: NormalizedLandmark): boolean {
+    const a0 = ang(vecNorm(l11, l12), vecNorm(l21, l22));
+
+    return Math.abs(a0) < Math.PI / 4;
+}
+
 function onResults(
     cx: CanvasRenderingContext2D,
     cvs: HTMLCanvasElement,
     res: Results,
-    onDraw: (e: Event) => void,
-    onErase: (e: Event) => void,
-    onColorPicker: (e: Event) => void,
-    onNone: (e: Event) => void,
+    onActionChange: (e: ActionChange) => any,
 ) {
     cx.restore();
     cx.clearRect(0, 0, cvs.width, cvs.height);
     cx.drawImage(res.image, 0, 0, cvs.width, cvs.height);
+    const ONESEVENTH = 0.15
+    const RADIUS = 25;
+    cx.beginPath();
+    cx.fillStyle = "violet"
+    cx.arc(0.125 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "indigo"
+    cx.arc(0.250 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "blue"
+    cx.arc(0.375 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "green"
+    cx.arc(0.500 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "yellow"
+    cx.arc(0.625 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "orange"
+    cx.arc(0.750 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
+    cx.beginPath();
+    cx.fillStyle = "red"
+    cx.arc(0.875 * cvs.width, (1 - ONESEVENTH) * cvs.height, RADIUS, 0, Math.PI * 2);
+    cx.fill();
     cx.lineJoin = "round";
     cx.lineWidth = 5;
     const r: NormalizedLandmarkList[] = [],
         l: NormalizedLandmarkList[] = [];
 
+    let draw = false, erase = false, colorPicker = false;
+    if (res.multiHandedness.length === 0) {
+        prevR = null;
+        prevL = null;
+    }
     for (let k in res.multiHandedness) {
         const h = res.multiHandedness[k];
         const hList = (h.label === "Right") ? r : l;
@@ -110,22 +147,21 @@ function onResults(
         }
 
         // draw finger
-        const d1 = dist(hList[1][3], hList[2][3]);
-        const d2 = dist(hList[2][3], hList[2][0]);
-        let draw = false, erase = false, colorPicker = false;
-        if (isStraight(hList, 1, Math.PI / 15) && d1 > d2) {
-            onDraw({ a: Action.Draw, d: "" });
-            draw = true;
+        if (isStraight(hList, 1, Math.PI / 15) 
+            && !isPerp(hList[1][2], hList[1][3], hList[2][2], hList[2][3])
+            && !isPerp(hList[1][2], hList[1][3], hList[3][2], hList[3][3])
+            && !isPerp(hList[1][2], hList[1][3], hList[4][2], hList[4][3])) {
+            onActionChange({ a: Action.Pen, d: "" });
             let next: [number, number] = [hList[1][3].x * cvs.width, hList[1][3].y * cvs.height];
             if (h.label === "Right") {
                 if (prevR) {
-                    points.push([prevR, next, (' ' + color).slice(1)]);
+                    points.push([prevR, next, cp ? "cyan" : (' ' + color).slice(1)]);
                 }
                 prevR = next;
             }
             if (h.label === "Left") {
                 if (prevL) {
-                    points.push([prevL, next, (' ' + color).slice(1)]);
+                    points.push([prevL, next, cp ? "cyan" : (' ' + color).slice(1)]);
                 }
                 prevL = next;
             }
@@ -143,7 +179,7 @@ function onResults(
             if (hList[i][3].y > hList[i][2].y) { allAbove = false; }
         }
         if (allStraight && allAbove) {
-            onErase({ a: Action.Erase, d: "" });
+            onActionChange({ a: Action.Eraser, d: "" });
             erase = true;
             cx.beginPath();
             cx.arc(hList[2][3].x * cvs.width, hList[2][3].y * cvs.height, radius, 0, 2 * Math.PI);
@@ -180,7 +216,7 @@ function onResults(
         const he = Math.abs(bot - top);
 
         if ((dc1 < dc2 || dc1 < dc3) && (wi > 1 && he > 1)) {
-            onColorPicker({ a: Action.ColorPicker, d: color });
+            onActionChange({ a: Action.Color, d: color });
             colorPicker = true;
             cx.strokeStyle = "black";
             cx.strokeRect(left - 2, top + 2, wi + 4, he + 4);
@@ -199,32 +235,99 @@ function onResults(
             const a = aSum * 4 / l;
             color = `rgba(${r}, ${g}, ${b}, ${a})`;
         }
-        if (!draw && !erase && !colorPicker) { onNone({ a: Action.None, d: "" }); }
 
-        // draw
-        for (const seg of points) {
-            cx.strokeStyle = seg[2];
-            cx.beginPath();
-            cx.moveTo(seg[0][0], seg[0][1]);
-            cx.lineTo(seg[1][0], seg[1][1]);
-            cx.stroke()
+        //fk u
+        if (isStraight(hList, 2, Math.PI / 15) 
+            && !isPerp(hList[2][2], hList[2][3], hList[1][2], hList[1][3])
+            && !isPerp(hList[2][2], hList[2][3], hList[3][2], hList[3][3])
+            && !isPerp(hList[2][2], hList[2][3], hList[4][2], hList[4][3])
+            && hList[2][3].y - hList[2][1].y < 0) {
+            onActionChange({ a: Action.Clear, d: "fk u"})
+            fku = true;
+            points = [];
         }
 
-        if (res.multiHandLandmarks) {
-            for (const landmarks of res.multiHandLandmarks) {
-                drawConnectors(cx, landmarks, HAND_CONNECTIONS, {
-                    color: "#00FF00",
-                    lineWidth: 5,
-                });
-                drawLandmarks(cx, landmarks, { color: "#FF0000", lineWidth: 2 });
+        if (!draw && !erase && !colorPicker && !fku) { onActionChange({ a: Action.None, d: "" }); }
+    }
+
+    // copy paste
+    if (res.multiHandedness.length === 2) {
+        // let r = res.multiHandedness[0].label === "Right" ? 0 : 1;
+        // let l = 1 - r;
+        const eps1 = 0.01;
+        const eps2 = 0.05;
+        const eps3 = 0.10;
+        let dc = dist(res.multiHandLandmarks[0][8], res.multiHandLandmarks[1][8])
+        let dc1 = dist(res.multiHandLandmarks[0][12], res.multiHandLandmarks[1][12])
+        // console.log(dc);
+        if (dc < eps1) {
+            if (dc1 > eps3) {
+                cp = true;
             }
         }
-        cx.save();
+        if (cp && dc > eps2) {
+            cpm = true;
+        }
+        // console.log(cp, cpm);
+        // let left = [5000, 5000], right = [0, 0], top = [0, 0], bot = [5000, 5000];
+        if (cp && cpm && dc < eps1) {
+            // for (const seg of points) {
+            //     if (seg[2] === "orange") {
+            //         let left = seg[0][0] * cvs.width;
+            //         let right = seg[] * cvs.width;
+            //         left = (left + (left_ + right) / 2) / 2;
+            //         right = (right + (left_ + right) / 2) / 2;
+            //         left_ = left;
+            //         left = (left + (left_ + right) / 2) / 2;
+            //         right = (right + (left_ + right) / 2) / 2;
+            //         const wi = Math.abs(right - left);
+            //         let top = hList[1][1].y * cvs.height;
+            //         let top_ = top;
+            //         let bot = hList[0][1].y * cvs.height;
+            //         top = (top + (top_ + bot) / 2) / 2;
+            //         bot = (bot + (top_ + bot) / 2) / 2;
+            //         top_ = top;
+            //         const he = Math.abs(bot - top);
+            //         }
+            //     cx.strokeStyle = seg[2];
+            //     cx.beginPath();
+            //     cx.moveTo(seg[0][0], seg[0][1]);
+            //     cx.lineTo(seg[1][0], seg[1][1]);
+            //     cx.stroke()
+            // }
+            cpmm = true;
+        }
+        if (cp && cpm && cpmm && dc > eps2) {
+            cp = false;
+            cpm = false;
+            cpmm = false;
+        }
     }
+    
+    // console.log(res)
+    // draw
+    for (const seg of points) {
+        cx.strokeStyle = seg[2];
+        cx.beginPath();
+        cx.moveTo(seg[0][0], seg[0][1]);
+        cx.lineTo(seg[1][0], seg[1][1]);
+        cx.stroke()
+    }
+
+    if (res.multiHandLandmarks) {
+        for (const landmarks of res.multiHandLandmarks) {
+            drawConnectors(cx, landmarks, HAND_CONNECTIONS, {
+                color: "#00FF00",
+                lineWidth: 5,
+            });
+            drawLandmarks(cx, landmarks, { color: "#FF0000", lineWidth: 2 });
+        }
+    }
+    cx.save();
 }
 
 function Canvas_(
-    { width, height, onRecordEnd, onDraw, onErase, onColorPicker, onNone }: Readonly<Props>,
+    { width, height, onActionChange, onRecordEnd }: Readonly<Props>,
     ref: ForwardedRef<Ref>
 ) {
     const cvs = useRef<HTMLCanvasElement | null>(null);
@@ -274,7 +377,7 @@ function Canvas_(
 
         hands.current!.onResults((r) => {
             if (cx.current && cvs.current) {
-                onResults(cx.current, cvs.current, r, onDraw, onErase, onColorPicker, onNone);
+                onResults(cx.current, cvs.current, r, onActionChange);
             }
         });
 
