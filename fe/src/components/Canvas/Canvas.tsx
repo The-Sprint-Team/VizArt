@@ -20,6 +20,7 @@ import {
   NormalizedLandmark,
 } from "@mediapipe/drawing_utils";
 import styles from "./style.module.scss";
+import deepai from "deepai";
 
 export interface Props {
   width: number;
