@@ -1,4 +1,3 @@
-// TODO: CLEAR FUCK YOU
 // TODO: COPY PASTE
 import {
     useRef,
@@ -144,6 +143,10 @@ function onResults(
         l: NormalizedLandmarkList[] = [];
 
     let draw = false, erase = false, colorPicker = false;
+    if (res.multiHandedness.length === 0) {
+        prevR = null;
+        prevL = null;
+    }
     for (let k in res.multiHandedness) {
         const h = res.multiHandedness[k];
         const hList = (h.label === "Right") ? r : l;
