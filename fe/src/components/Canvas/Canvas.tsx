@@ -26,12 +26,14 @@ export interface Props {
   height: number;
   onRecordEnd?: (vid: Blob, b64thumb: string) => any;
   onActionChange: (e: ActionChange) => any;
+  disabled: boolean;
 }
 
 export interface Ref {
   start: () => void;
   pause: () => void;
   stop: () => void;
+  clear: () => void;
 }
 
 export type ActionChange = {
@@ -48,6 +50,7 @@ export enum Action {
   Generate = "Generate",
 }
 
+let disabled_ = false;
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]
 let prevR: any = null;
 let prevL: any = null;
@@ -446,7 +449,7 @@ function onResults(
 }
 
 function Canvas_(
-  { width, height, onActionChange, onRecordEnd }: Readonly<Props>,
+  { width, height, onActionChange, onRecordEnd, disabled }: Readonly<Props>,
   ref: ForwardedRef<Ref>
 ) {
   const cvs = useRef<HTMLCanvasElement | null>(null);
@@ -455,6 +458,8 @@ function Canvas_(
   const hands = useRef<Hands | null>(null);
   const cam = useRef<Camera | null>(null);
   const rec = useRef<MediaRecorder | null>(null);
+
+  disabled_ = disabled;
 
   useImperativeHandle(
     ref,
@@ -468,6 +473,9 @@ function Canvas_(
       pause: () => {
         rec.current?.pause();
       },
+      clear: () => {
+        points = [];
+      }
     }),
     [rec]
   );
@@ -495,7 +503,7 @@ function Canvas_(
     });
 
     hands.current!.onResults((r) => {
-      if (cx.current && cvs.current) {
+      if (!disabled_ && cx.current && cvs.current) {
         onResults(cx.current, cvs.current, r, onActionChange);
       }
     });

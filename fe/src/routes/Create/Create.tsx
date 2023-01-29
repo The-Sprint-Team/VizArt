@@ -69,6 +69,7 @@ export default function Create({ forcedTitle }: Props) {
   });
   const [vid, setVid] = useState<{ b: Blob; thumb: string } | null>(null);
   const [playState, setPlayState] = useState(PlayState.Start);
+  const [cvsDisabled, setCvsDisabled] = useState(false);
 
   const ref = useRef<CanvasRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -258,6 +259,7 @@ export default function Create({ forcedTitle }: Props) {
                 onActionChange={onActionChange}
                 width={canvasRef.current.clientWidth} //canvasRef.current.clientHeight
                 height={(canvasRef.current.clientWidth * 9) / 16}
+                disabled={cvsDisabled}
                 ref={ref}
                 onRecordEnd={onRecordEnd}
               />
