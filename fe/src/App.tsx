@@ -16,7 +16,7 @@ function App() {
           <Route path="create" element={<Create />} />
           <Route
             path="compete"
-            element={<Create forcedTitle="Tree 🌲 Competition" />}
+            element={<Create forcedTitle="Tree 🌲Competition" />}
           />
           <Route path="explore/:uid" element={<Share />} />
           <Route path="explore" element={<Explore />} />

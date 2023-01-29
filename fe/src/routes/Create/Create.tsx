@@ -331,7 +331,7 @@ export default function Create({ forcedTitle }: Props) {
 
               <TutorialBlock
                 title="Draw"
-                description="Draw with your index finger straight!"
+                description="Draw with your index finger STRAIGHT!"
                 image="demoDraw.png"
               />
               <hr />
@@ -343,7 +343,7 @@ export default function Create({ forcedTitle }: Props) {
               <hr />
               <TutorialBlock
                 title="Erase"
-                description="Erase with 4 finger tips straight!"
+                description="Erase with 4 finger tips STRAIGHT!"
                 image="demoErase.png"
               />
               <hr />
@@ -356,6 +356,11 @@ export default function Create({ forcedTitle }: Props) {
                 title="Recording"
                 description="Record your drawing video and submit it!"
                 image="demoRecord.png"
+              />
+                       <TutorialBlock
+                title="Clear"
+                description="Clear by holding up your pinky finger STRAIGHT!"
+                image="demoClear.png"
               />
             </div>
 
