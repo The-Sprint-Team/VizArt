@@ -83,14 +83,16 @@ export default function Share() {
           <h1 className={styles.title}>{post.title}</h1>
           <p className={styles.date}>{convertTime(post.date)}</p>
           <video
-            src={post.video}
             className={styles.video}
             playsInline
             autoPlay
             muted
             loop
             controls={true}
-          />
+            preload="yes"
+          >
+            <source src={post.video} type="video/webm" />
+          </video>
           <div className={styles.share}>
             <Button
               name={isCopied ? "Copied!" : "Copy link"}
