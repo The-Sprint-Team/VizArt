@@ -202,20 +202,27 @@ export default function Create() {
 
           <TutorialBlock
             title="Draw"
-            description="draw with your finger tip"
-            image=""
+            description="draw with your finger tips straight!"
+            image="demoDraw.png"
           />
+
+            <TutorialBlock
+            title="Nothing"
+            description="squeeze fist for no actions"
+            image="demoNothing.png"
+          />
+
           <TutorialBlock
             title="Erase"
-            description="draw with your finger tip"
-            image=""
+            description="erase with 4 finger tips straight!"
+            image="demoErase.png"
           />
           <TutorialBlock
             title="Color Pick"
-            description="draw with your finger tip"
-            image=""
+            description="pick a color in the real world by doing an 'ok' sign"
+            image="demoColorPick.png"
           />
-          <TutorialBlock
+          {/* <TutorialBlock
             title="Copy"
             description="draw with your finger tip"
             image=""
@@ -229,11 +236,10 @@ export default function Create() {
             title="Record"
             description="draw with your finger tip"
             image=""
-          />
-                    <Button name="Close" isPressed={false} onClick={updateShowTutorial} width={120} />
-
+          /> */}
+            <Button name="Close" isPressed={false} onClick={updateShowTutorial} width={120} />
         </>
-        
+      
       </Tutorial>
 
       <Modal isVisible={showPublish} width={400} height={400}>
