@@ -1,44 +1,26 @@
+import Layout from "./components/Layout/Layout";
+
 import Create from "./routes/Create/Create";
 import Compete from "./routes/Compete/Compete";
 import Explore from "./routes/Explore/Explore";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import "./App.css";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Create />,
-  },
-  {
-    path: "/create",
-    element: <Create />,
-  },
-  {
-    path: "/compete",
-    element: <Compete />,
-  },
-  {
-    path: "/explore",
-    element: <Explore />,
-    // children: [
-    //   {
-    //     path: "events/:id",
-    //     element: <Event />,
-    //     loader: eventLoader,
-    //   },
-    // ],
-  },
-  { path: "*", element: <Navigate to="create" replace={true} /> },
-]);
-
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="create" element={<Create />} />
+          <Route path="compete" element={<Compete />} />
+          <Route path="explore" element={<Explore />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/create" />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
