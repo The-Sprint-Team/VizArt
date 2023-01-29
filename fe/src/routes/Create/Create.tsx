@@ -118,12 +118,12 @@ export default function Create({ forcedTitle }: Props) {
   const updateShowGenerate = () => {
     if (!showGenerate) {
       //pause video
-
+      pauseRecording();
       //prevent scroll on body
       document.body.style.overflow = "hidden";
     } else {
       //play video
-
+      playRecording();
       //allow scroll on body
       document.body.style.overflow = "auto";
     }
@@ -136,14 +136,19 @@ export default function Create({ forcedTitle }: Props) {
       api
         .uploadFile(artName, vid.b, vid.thumb)
         .then((res) => {
+          document.body.style.overflow = "auto";
           navigate(`/explore/${res}`);
           setIsLoading(false);
         })
-        .catch(console.error);
+        .catch((e) => {
+          document.body.style.overflow = "auto";
+          setIsLoading(false);
+        });
     }
   };
 
   const onStart = () => {
+    playRecording();
     resetDrawing();
     startRecording();
     setPlayState(PlayState.Stop);
@@ -153,7 +158,14 @@ export default function Create({ forcedTitle }: Props) {
     }, 1000);
   };
 
+  useEffect(() => {
+    if (time >= maxTime) {
+      onStop();
+    }
+  }, [time]);
+
   const onStop = () => {
+    pauseRecording();
     stopRecording();
     setPlayState(PlayState.Restart);
     clearInterval(interval.current);
@@ -166,6 +178,7 @@ export default function Create({ forcedTitle }: Props) {
   };
 
   const onDelete = () => {
+    playRecording();
     resetDrawing();
     setPlayState(PlayState.Start);
     setTime(0);
@@ -174,7 +187,17 @@ export default function Create({ forcedTitle }: Props) {
 
   const onGenerate = () => {};
 
-  const resetDrawing = () => {};
+  const resetDrawing = () => {
+    ref.current?.clear();
+  };
+
+  const pauseRecording = () => {
+    setCvsDisabled(true);
+  };
+
+  const playRecording = () => {
+    setCvsDisabled(false);
+  };
 
   useEffect(() => {
     if (forcedTitle) {
