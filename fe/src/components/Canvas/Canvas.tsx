@@ -25,11 +25,7 @@ export interface Props {
     width: number;
     height: number;
     onRecordEnd?: (vid: Blob, b64thumb: string) => any;
-    onDraw: (e: Event) => void;
-    onErase: (e: Event) => void;
-    onColorPicker: (e: Event) => void;
-    onNone: (e: Event) => void;
-    onFkU: (e: Event) => void;
+    onActionChange: (e: ActionChange) => any;
 }
 
 export interface Ref {
@@ -38,17 +34,17 @@ export interface Ref {
     stop: () => void;
 }
 
-export type Event = {
+export type ActionChange = {
     a: Action,
     d: string
 }
 
-enum Action {
-    None,
-    Draw,
-    Erase,
-    ColorPicker,
-    FkU,
+export enum Action {
+    None = "None",
+    Pen = "Pen",
+    Eraser = "Eraser",
+    Color = "Color",
+    Clear = "Clear",
 }
 
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]
@@ -98,11 +94,7 @@ function onResults(
     cx: CanvasRenderingContext2D,
     cvs: HTMLCanvasElement,
     res: Results,
-    onDraw: (e: Event) => void,
-    onErase: (e: Event) => void,
-    onColorPicker: (e: Event) => void,
-    onNone: (e: Event) => void,
-    onFkU: (e: Event) => void,
+    onActionChange: (e: ActionChange) => any,
 ) {
     cx.restore();
     cx.clearRect(0, 0, cvs.width, cvs.height);
@@ -159,7 +151,7 @@ function onResults(
             && !isPerp(hList[1][2], hList[1][3], hList[2][2], hList[2][3])
             && !isPerp(hList[1][2], hList[1][3], hList[3][2], hList[3][3])
             && !isPerp(hList[1][2], hList[1][3], hList[4][2], hList[4][3])) {
-            onDraw({ a: Action.Draw, d: "" });
+            onActionChange({ a: Action.Pen, d: "" });
             let next: [number, number] = [hList[1][3].x * cvs.width, hList[1][3].y * cvs.height];
             if (h.label === "Right") {
                 if (prevR) {
@@ -187,7 +179,7 @@ function onResults(
             if (hList[i][3].y > hList[i][2].y) { allAbove = false; }
         }
         if (allStraight && allAbove) {
-            onErase({ a: Action.Erase, d: "" });
+            onActionChange({ a: Action.Eraser, d: "" });
             erase = true;
             cx.beginPath();
             cx.arc(hList[2][3].x * cvs.width, hList[2][3].y * cvs.height, radius, 0, 2 * Math.PI);
@@ -224,7 +216,7 @@ function onResults(
         const he = Math.abs(bot - top);
 
         if ((dc1 < dc2 || dc1 < dc3) && (wi > 1 && he > 1)) {
-            onColorPicker({ a: Action.ColorPicker, d: color });
+            onActionChange({ a: Action.Color, d: color });
             colorPicker = true;
             cx.strokeStyle = "black";
             cx.strokeRect(left - 2, top + 2, wi + 4, he + 4);
@@ -250,12 +242,12 @@ function onResults(
             && !isPerp(hList[2][2], hList[2][3], hList[3][2], hList[3][3])
             && !isPerp(hList[2][2], hList[2][3], hList[4][2], hList[4][3])
             && hList[2][3].y - hList[2][1].y < 0) {
-            onFkU({ a: Action.FkU, d: "fk u"})
+            onActionChange({ a: Action.Clear, d: "fk u"})
             fku = true;
             points = [];
         }
 
-        if (!draw && !erase && !colorPicker && !fku) { onNone({ a: Action.None, d: "" }); }
+        if (!draw && !erase && !colorPicker && !fku) { onActionChange({ a: Action.None, d: "" }); }
     }
 
     // copy paste
@@ -335,7 +327,7 @@ function onResults(
 }
 
 function Canvas_(
-    { width, height, onRecordEnd, onDraw, onErase, onColorPicker, onNone, onFkU }: Readonly<Props>,
+    { width, height, onActionChange, onRecordEnd }: Readonly<Props>,
     ref: ForwardedRef<Ref>
 ) {
     const cvs = useRef<HTMLCanvasElement | null>(null);
@@ -385,7 +377,7 @@ function Canvas_(
 
         hands.current!.onResults((r) => {
             if (cx.current && cvs.current) {
-                onResults(cx.current, cvs.current, r, onDraw, onErase, onColorPicker, onNone, onFkU);
+                onResults(cx.current, cvs.current, r, onActionChange);
             }
         });
 

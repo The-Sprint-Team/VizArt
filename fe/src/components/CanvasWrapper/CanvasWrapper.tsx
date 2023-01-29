@@ -1,42 +1,12 @@
 import { ForwardedRef, forwardRef } from "react";
-import Canvas, { Ref, Props as CanvasProps, Event as EventThing } from "../Canvas/Canvas";
+import Canvas, { Ref, Props } from "../Canvas/Canvas";
+export { Action } from "../Canvas/Canvas";
+export type { Props, Ref, ActionChange } from "../Canvas/Canvas";
 
-type Props = {
-  width: number;
-  height: number;
-  onRecordEnd: CanvasProps["onRecordEnd"];
-  onDraw: (e: EventThing) => void;
-  onErase: (e: EventThing) => void;
-  onColorPicker: (e: EventThing) => void;
-  onNone: (e: EventThing) => void;
-  onFkU: (e: EventThing) => void;
-};
-
-function CanvasWrapper_(
-  {
-    width,
-    height,
-    onRecordEnd,
-    onDraw,
-    onErase,
-    onColorPicker,
-    onNone,
-    onFkU,
-  }: Props,
-  ref: ForwardedRef<Ref>
-) {
+function CanvasWrapper_(props: Props, ref: ForwardedRef<Ref>) {
   return (
     <div>
-      <Canvas
-        onDraw={onDraw}
-        onErase={onErase}
-        onColorPicker={onColorPicker}
-        onNone={onNone}
-        onFkU={onFkU}
-        width={width}
-        height={height}
-        {...{ ref, onRecordEnd }}
-      />
+      <Canvas {...props} ref={ref} />
     </div>
   );
 }
