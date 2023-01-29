@@ -5,7 +5,7 @@ export type { Props, Ref, ActionChange } from "../Canvas/Canvas";
 
 function CanvasWrapper_(props: Props, ref: ForwardedRef<Ref>) {
   return (
-    <div>
+    <div style={{ zIndex: 2 }}>
       <Canvas {...props} ref={ref} />
     </div>
   );

@@ -21,6 +21,7 @@ import CanvasWrapper, {
   Action,
 } from "../../components/CanvasWrapper/CanvasWrapper";
 import SizeCap from "../../components/SizeCap/SizeCap";
+import Loader from "../../components/Loader/Loader";
 
 import api from "../../api";
 import Tutorial from "../../components/Tutorial/Tutorial";
@@ -188,11 +189,7 @@ export default function Create({ forcedTitle }: Props) {
         </div>
 
         <div className={styles.canvasContainer}>
-          <div
-            className={styles.canvas}
-            ref={canvasRef}
-            data-show={canvasRef.current !== null}
-          >
+          <div className={styles.canvas} ref={canvasRef}>
             {isStarted && <div className={styles.recordingCircle} />}
             <div
               className={styles.actionContainer}
@@ -200,6 +197,7 @@ export default function Create({ forcedTitle }: Props) {
             >
               {/* <h1 className={styles.action}>{actionChange?.a.toString()}</h1> */}
             </div>
+
             {canvasRef.current && (
               <CanvasWrapper
                 onActionChange={onActionChange}
@@ -334,8 +332,5 @@ export default function Create({ forcedTitle }: Props) {
   );
 }
 
-//search
-//canvas size
 //countdown
-//action selection
-//competition submissions
+//action

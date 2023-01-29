@@ -6,6 +6,7 @@ type Props = {
   fontSize?: number;
   placeholder?: string;
   isLocked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function Input({
@@ -14,6 +15,8 @@ export default function Input({
   fontSize,
   placeholder,
   isLocked,
+  onChange,
+  ...rest
 }: Props) {
   return (
     <div
@@ -22,7 +25,10 @@ export default function Input({
     >
       <input
         className={styles.top}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          if (onChange) onChange(e);
+        }}
         value={value}
         placeholder={placeholder}
         type="text"

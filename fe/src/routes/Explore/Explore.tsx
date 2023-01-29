@@ -18,16 +18,56 @@ type PostContent = {
   uid: string;
 };
 
+const vidAmount = 21;
+const competitionName = "Face Competition";
+
 export default function Explore() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [searchTitle, setSearchTitle] = useState("Recent Posts");
   const [posts, setPosts] = useState(new Array<PostContent>());
+  const [allPosts, setAllPosts] = useState(new Array<PostContent>());
 
-  const onSearch = () => {};
+  const onSearch = (val: string) => {
+    setIsLoading(true);
+    const tempPosts = new Array<PostContent>();
+    for (let post of allPosts) {
+      if (post.title.toLowerCase().includes(val.toLowerCase())) {
+        tempPosts.push(post);
+      }
+    }
+    //sort by most recent
+    tempPosts.sort((a, b) => {
+      return b.date.getTime() - a.date.getTime();
+    });
+    setPosts(tempPosts);
+    setSearchTitle("Search Results");
+    setIsLoading(false);
+  };
 
-  useEffect(() => {
+  const searchForCompetition = () => {
+    setIsLoading(true);
+    const tempPosts = new Array<PostContent>();
+    for (let post of allPosts) {
+      if (post.title.toLowerCase().includes(competitionName.toLowerCase())) {
+        tempPosts.push(post);
+      }
+    }
+    //sort by most recent
+    tempPosts.sort((a, b) => {
+      return b.date.getTime() - a.date.getTime();
+    });
+    setPosts(tempPosts);
+    setSearchTitle("Search Results");
+    setIsLoading(false);
+  };
+
+  const refresh = async () => {
+    setIsLoading(true);
+    setPosts([]);
+    //wait 0.5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 500));
     api
       .listVideos()
       .then((res) => {
@@ -40,12 +80,21 @@ export default function Explore() {
             uid: uid,
           });
         }
+        //sort by most recent
+        tempPosts.sort((a, b) => {
+          return b.date.getTime() - a.date.getTime();
+        });
         setPosts(tempPosts);
+        setAllPosts(tempPosts);
         setIsLoading(false);
       })
       .catch(() => {
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    refresh();
   }, []);
 
   return (
@@ -64,9 +113,15 @@ export default function Explore() {
           <Input
             value={search}
             setValue={setSearch}
+            onChange={(e) => onSearch(e.target.value)}
             placeholder="Search for art..."
           />
-          <Button name="Search" isPressed={false} onClick={onSearch} />
+          <Button name="Refresh" isPressed={false} onClick={refresh} />
+          <Button
+            name="View Competition Posts"
+            isPressed={false}
+            onClick={searchForCompetition}
+          />
         </div>
         <p className={styles.searchTitle}>{searchTitle}</p>
         {isLoading && (
@@ -75,7 +130,7 @@ export default function Explore() {
           </div>
         )}
         <div className={styles.posts}>
-          {posts.map((post, index) => {
+          {posts.slice(0, vidAmount).map((post, index) => {
             return (
               <Post
                 title={post.title}
@@ -86,6 +141,10 @@ export default function Explore() {
               />
             );
           })}
+
+          {posts.length === 0 && !isLoading && (
+            <p className={styles.noPosts}>No posts found</p>
+          )}
         </div>
       </div>
     </div>
