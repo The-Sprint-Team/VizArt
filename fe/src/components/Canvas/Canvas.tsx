@@ -521,7 +521,7 @@ function Canvas_(
     rec.current = new MediaRecorder(cvs.current!.captureStream(30), {
       audioBitsPerSecond: 128000,
       videoBitsPerSecond: 2500000,
-      mimeType: "video/webm",
+      mimeType: "video/mp4",
     });
 
     const cx_ = cx.current;
