@@ -91,7 +91,7 @@ export default function Share() {
             controls={true}
             preload="yes"
           >
-            <source src={post.video} type="video/mp4" />
+            <source src={post.video} type="video/webm" />
           </video>
           <div className={styles.share}>
             <Button

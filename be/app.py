@@ -25,7 +25,7 @@ def fileinfo(uid: str):
         name = f.read()
     return {
         "name": name,
-        "vid": os.path.join(base, "vid.mp4"),
+        "vid": os.path.join(base, "vid.webm"),
         "thumb": os.path.join(base, "thumb.png"),
         "time": time.astimezone().isoformat(),
     }
@@ -56,7 +56,7 @@ def upload():
     path = os.path.join(app.config["UPLOAD_FOLDER"], uid)
 
     os.makedirs(path, exist_ok=True)
-    file.save(os.path.join(path, "vid.mp4"))
+    file.save(os.path.join(path, "vid.webm"))
 
     with open(os.path.join(path, "thumb.png"), "wb") as f:
         buf = base64.b64decode(thumb)
