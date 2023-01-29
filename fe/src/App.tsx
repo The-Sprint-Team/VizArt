@@ -1,7 +1,6 @@
 import Layout from "./components/Layout/Layout";
 
 import Create from "./routes/Create/Create";
-import Compete from "./routes/Compete/Compete";
 import Explore from "./routes/Explore/Explore";
 import Share from "./routes/Share/Share";
 
@@ -15,7 +14,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route path="create" element={<Create />} />
-          <Route path="compete" element={<Compete />} />
+          <Route
+            path="compete"
+            element={<Create forcedTitle="Face Competition" />}
+          />
           <Route path="explore/:uid" element={<Share />} />
           <Route path="explore" element={<Explore />} />
           <Route path="" element={<Navigate to="/create" replace={true} />} />

@@ -5,6 +5,7 @@ type Props = {
   value: string;
   fontSize?: number;
   placeholder?: string;
+  isLocked?: boolean;
 };
 
 export default function Input({
@@ -12,6 +13,7 @@ export default function Input({
   value,
   fontSize,
   placeholder,
+  isLocked,
 }: Props) {
   return (
     <div
@@ -27,6 +29,9 @@ export default function Input({
         autoComplete="off"
         data-lpignore="true"
         data-form-type="other"
+        readOnly={isLocked ? true : false}
+        disabled={isLocked ? true : false}
+        data-disabled={isLocked ? true : false}
       />
     </div>
   );

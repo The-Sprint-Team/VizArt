@@ -23,6 +23,15 @@
 }
 
 .actionContainer {
+  //overlay on top of the canvas
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action {
@@ -34,6 +43,7 @@
   border-radius: 10px;
   width: 1000px;
   height: 500px;
+  position: relative;
 }
 
 .bottomBar {
@@ -55,5 +65,94 @@
   height: 20px;
   border-radius: 50%;
   background-color: #ff0000;
-  //top left
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bottomPublishButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.tutContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+}
+
+.tutContent {
+  overflow: scroll;
+}
+
+.floatingTutorial {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid rgb(173, 173, 173);
+}
+
+.tutTitle {
+  font-size: 24px;
+  font-weight: 700;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 0;
+}
+
+.tutSubtitle {
+  font-size: 16px;
+  font-weight: 500;
+  padding-bottom: 30px;
+  margin: 0;
+}
+
+.publishModal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.competitionModal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+}
+
+.bottomButtonsComp {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  gap: 30px;
+  //set to bottom of flex
+  margin-top: auto;
+}
+
+hr {
+  border: 0.5px solid rgb(217, 217, 217);
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

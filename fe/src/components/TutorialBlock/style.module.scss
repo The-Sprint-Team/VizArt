@@ -1,5 +1,4 @@
-
-.tutorialBlock{
+.tutorialBlock {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -7,19 +6,29 @@
   width: 70%;
 }
 
-.imageContainer{
-  width: 50%;
-  img{
-    width: 80%;
-    height: 70%;
+.imageContainer {
+  border-radius: 10px;
+  border: 1px solid #949494;
+  margin-right: 20px;
+  img {
+    width: 140px;
+    height: auto;
   }
 }
 
-.descriptionContainer{
-  width: 50%;
-h3{
-    font-size: 30px;
-}
-  
+.descriptionContainer {
+  width: 100%;
 }
 
+.title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.description {
+  font-size: 16px;
+  font-weight: 400;
+  padding: 0;
+  padding-bottom: 5px;
+  width: 100%;
+}
