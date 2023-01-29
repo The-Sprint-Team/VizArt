@@ -12,8 +12,7 @@ Create and share your artwork with the world using VizArt - a simple yet powerfu
 ## 💫 Inspiration
 <br/>
 
-> "Art is the signature of civilizations." - Beverly Sills
-> 
+> "Art is the signature of civilizations." - Beverly Sills 
 
 <br/>
 
@@ -24,7 +23,7 @@ We started by pushing the limits of what's possible with customizable deep learn
 <br/>
 
 > "Art is the reflection of life, and life is the reflection of art." - Unknow
-> 
+
 <br/>
 
 Air writing is made possible with hand gestures, such as a pen gesture to draw and an eraser gesture to erase lines. With VizArt, you can turn your ideas into reality by sketching in the air.
@@ -50,6 +49,7 @@ Our computer vision algorithm enables you to interact with the world using a col
 <br/>
 
 > "Art is not what you see, but what you make others see." - Claude Monet
+
 <br/>
 
 
