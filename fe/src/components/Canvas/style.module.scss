@@ -1,8 +1,13 @@
-.canvas {
+.container {
   min-width: "100vw";
   height: "100vh";
   display: "flex";
   flex: 1;
   align-items: center;
   justify-content: center;
+  border-radius: 5px;
+}
+
+.canvas {
+  border-radius: 5px;
 }

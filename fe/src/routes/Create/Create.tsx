@@ -188,23 +188,27 @@ export default function Create({ forcedTitle }: Props) {
         </div>
 
         <div className={styles.canvasContainer}>
-          <div className={styles.canvas} ref={canvasRef}>
+          <div
+            className={styles.canvas}
+            ref={canvasRef}
+            data-show={canvasRef.current !== null}
+          >
             {isStarted && <div className={styles.recordingCircle} />}
             <div
               className={styles.actionContainer}
               // data-active={actionChange !== ""}
             >
-              <h1 className={styles.action}>{actionChange?.a.toString()}</h1>
+              {/* <h1 className={styles.action}>{actionChange?.a.toString()}</h1> */}
             </div>
-            {/* {canvasRef.current && ( */}
-            <CanvasWrapper
-              onActionChange={onActionChange}
-              width={800} //canvasRef.current.clientHeight
-              height={500}
-              ref={ref}
-              onRecordEnd={onRecordEnd}
-            />
-            {/* )} */}
+            {canvasRef.current && (
+              <CanvasWrapper
+                onActionChange={onActionChange}
+                width={canvasRef.current.clientWidth} //canvasRef.current.clientHeight
+                height={(canvasRef.current.clientWidth * 9) / 16}
+                ref={ref}
+                onRecordEnd={onRecordEnd}
+              />
+            )}
           </div>
         </div>
 
@@ -330,10 +334,8 @@ export default function Create({ forcedTitle }: Props) {
   );
 }
 
+//search
 //canvas size
 //countdown
-
 //action selection
-//publishing
-//background video screen bigger
-//search
+//competition submissions

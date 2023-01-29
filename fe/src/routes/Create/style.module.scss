@@ -1,5 +1,6 @@
 .container {
   padding: 30px;
+  padding-top: 10px;
 }
 
 .topBar {
@@ -42,7 +43,7 @@
   background-color: rgb(48, 48, 48);
   border-radius: 10px;
   width: 1000px;
-  height: 500px;
+  height: calc(1000px * 9 / 16);
   position: relative;
 }
 
