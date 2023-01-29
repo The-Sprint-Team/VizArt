@@ -192,11 +192,14 @@ export default function Create() {
         </div>
       </div>
 
-      <Tutorial isVisible={showTutorial} width={1000} height={800}>
+      <Tutorial isVisible={showTutorial} width={700} height={600}>
         <>
-          <h1>Tutorial</h1>
-          <Button name="Close" isPressed={false} onClick={updateShowTutorial} />
-          <h2> Learn to draw in the air</h2>
+          
+          <h1>Tutorial</h1>           
+          <Button name="Close" isPressed={false} onClick={updateShowTutorial} width={120} />
+
+          <h2> Learn to draw in the air!</h2>
+
           <TutorialBlock
             title="Draw"
             description="draw with your finger tip"
@@ -227,7 +230,10 @@ export default function Create() {
             description="draw with your finger tip"
             image=""
           />
+                    <Button name="Close" isPressed={false} onClick={updateShowTutorial} width={120} />
+
         </>
+        
       </Tutorial>
 
       <Modal isVisible={showPublish} width={400} height={400}>

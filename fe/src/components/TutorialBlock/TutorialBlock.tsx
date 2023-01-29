@@ -13,7 +13,6 @@ export default function TutorialBlock({ title, description, image }: Props) {
           <div className={styles.imageContainer}>
             <img src={demoDraw} alt="demo-draw" />
           </div>
-
           <div className={styles.descriptionContainer}>
             <h3>{title}</h3>
             <p>{description}</p>

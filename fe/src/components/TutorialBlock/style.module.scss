@@ -4,34 +4,22 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin: 10px;
-  
+  width: 70%;
 }
 
 .imageContainer{
-  margin: 10px;
   width: 50%;
-  border-color: black;
-  border-style: solid;
-  border-width: 1px;
-
   img{
     width: 80%;
-    height: 80%;
+    height: 70%;
   }
 }
 
 .descriptionContainer{
-  margin: 10px;
   width: 50%;
-
 h3{
-    margin: 10px;
     font-size: 30px;
 }
-  p{
-    margin: 10px;
-  }
   
 }
 
