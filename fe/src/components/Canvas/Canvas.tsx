@@ -23,7 +23,7 @@ import styles from "./style.module.scss";
 export interface Props {
   width: number;
   height: number;
-  onRecordEnd?: (data: Blob) => any;
+  onRecordEnd?: (vid: Blob, b64thumb: string) => any;
 }
 
 export interface Ref {
@@ -31,6 +31,7 @@ export interface Ref {
   pause: () => void;
   stop: () => void;
 }
+
 enum Action {
   Erase,
   Draw,
@@ -129,7 +130,6 @@ function onResults(
       isStraight(hList, 3) &&
       isStraight(hList, 4)
     ) {
-      console.log("JIJIJ");
       cx.beginPath();
       cx.arc(
         hList[2][3].x * cvs.width,
@@ -244,7 +244,13 @@ function Canvas_(
       mimeType: "video/webm",
     });
 
-    rec.current!.ondataavailable = (e: BlobEvent) => onRecordEnd?.(e.data);
+    const cx_ = cx.current;
+    const cvs_ = cvs.current;
+    rec.current!.ondataavailable = (e: BlobEvent) => {
+      const data = cvs_.toDataURL('image/png')
+      const b64 = data.replace(/^data:image\/png;base64,/, "");
+      onRecordEnd?.(e.data, b64);
+    };
   }, []);
 
   return (

@@ -1,11 +1,11 @@
 import { ForwardedRef, forwardRef } from "react";
-import Canvas, { Ref } from "../Canvas/Canvas";
+import Canvas, { Ref, Props as CanvasProps } from "../Canvas/Canvas";
 
 type Props = {
   start: () => any;
   stop: () => any;
   pause: () => any;
-  onRecordEnd: (data: Blob) => any;
+  onRecordEnd: CanvasProps["onRecordEnd"];
 };
 
 function CanvasWrapper_(
