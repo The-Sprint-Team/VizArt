@@ -27,7 +27,7 @@ const api = {
   },
 
   /// Upload a file with the given name, returning the id.
-  async uploadFile(name: string, data: Blob, thumb: string): Promise<number> {
+  async uploadFile(name: string, data: Blob, thumb: string): Promise<string> {
     let form = new FormData();
     form.append("file", data);
     form.append("name", name);
@@ -37,7 +37,7 @@ const api = {
       body: form,
     })
       .then((r) => r.json())
-      .then((d) => d.uid as number);
+      .then((d) => d.uid);
   },
 };
 export default api;
