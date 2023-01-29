@@ -19,7 +19,7 @@ type PostContent = {
 };
 
 const vidAmount = 21;
-const competitionName = "Face Competition";
+const competitionName = "McHacks Tree Competition";
 
 export default function Explore() {
   const navigate = useNavigate();
