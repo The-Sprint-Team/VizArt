@@ -1,22 +1,31 @@
 # 🤖🖌️ [VizArt Computer Vision Drawing Platform](https://vizart.tech)
+<br/>
 
 Create and share your artwork with the world using VizArt - a simple yet powerful air drawing platform.
+
+<br/>
 
 <p align="center">
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/65676392/215330789-e38f2b41-1d7b-45b9-bb4f-09be3ffb9bf8.png">
 </p>
 
 ## 💫 Inspiration
+<br/>
 
 > "Art is the signature of civilizations." - Beverly Sills
 > 
+
+<br/>
 
 Art is a gateway to creative expression. With [VizArt](https://vizart.tech/create), we are pushing the boundaries of what's possible with computer vision and enabling a new level of artistic expression. ***We envision a world where people can interact with both the physical and digital realms in creative ways.***
 
 We started by pushing the limits of what's possible with customizable deep learning, streaming media, and AR technologies. With VizArt, you can draw in art, interact with the real world digitally, and share your creations with your friends!
 
+<br/>
+
 > "Art is the reflection of life, and life is the reflection of art." - Unknow
 > 
+<br/>
 
 Air writing is made possible with hand gestures, such as a pen gesture to draw and an eraser gesture to erase lines. With VizArt, you can turn your ideas into reality by sketching in the air.
 
@@ -38,7 +47,10 @@ Our computer vision algorithm enables you to interact with the world using a col
 <img width="400" src="https://user-images.githubusercontent.com/65676392/215331038-055999cb-85ad-4383-8373-f47d3534457d.png">
 </p>
 
+<br/>
+
 > "Art is not what you see, but what you make others see." - Claude Monet
+<br/>
 
 
 The features I listed above are great! But what's the point of creating something if you can't share it with the world? That's why we've built a platform for you to showcase your art. You'll be able to record and share your drawings with friends.
