@@ -19,6 +19,9 @@ import CanvasWrapper from "../../components/CanvasWrapper/CanvasWrapper";
 
 import { Ref as CanvasRef } from "../../components/Canvas/Canvas";
 import api from "../../api";
+import Tutorial from "../../components/Tutorial/Tutorial";
+import TutorialBlock from "../../components/TutorialBlock/TutorialBlock";
+
 
 type Tool = {
   name: string;
@@ -121,13 +124,21 @@ export default function Create() {
           <Button name="Publish" isPressed={false} onClick={onPublish} />
         </div>
       </div>
-      <Modal isVisible={showTutorial} width={300} height={400}>
+
+      <Tutorial isVisible={showTutorial} width={1000} height={800}>
         <>
-          <h1>This is a test</h1>
-          <p>Put all the content you want in here</p>
+          <h1>Tutorial</h1>
           <Button name="Close" isPressed={false} onClick={updateShowTutorial} />
+          <h2> Learn to draw in the air</h2>  
+          <TutorialBlock title="Draw" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Erase" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Color Pick" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Copy" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Paste" description="draw with your finger tip" image="" />
+          <TutorialBlock title="Record" description="draw with your finger tip" image="" />
         </>
-      </Modal>
+      </Tutorial>
+      
       <Modal isVisible={showPublish} width={400} height={400}>
         <>
           <h1>This is a publish</h1>
