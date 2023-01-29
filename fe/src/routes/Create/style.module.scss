@@ -50,7 +50,7 @@
   margin-top: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 100px;
 }
 
@@ -58,6 +58,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  p {
+    font-size: 20px;
+    font-weight: 500;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin: 0;
+  }
 }
 
 .recordingCircle {
@@ -92,6 +100,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 30px;
+  margin-top: auto;
 }
 
 .tutContainer {
@@ -133,6 +142,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 300px;
 }
 
 .competitionModal {

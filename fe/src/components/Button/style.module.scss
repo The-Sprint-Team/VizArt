@@ -6,7 +6,7 @@
   border-radius: 5px;
   border: none;
   background-color: #4a4a4a;
-  color: #1E3050;
+  color: #1e3050;
 
   .top {
     font-family: "Open Sans", sans-serif;
@@ -15,14 +15,13 @@
     padding: 10px 20px;
     border-radius: 5px;
     border: none;
-    background-color: #F8D65B;
+    background-color: #f8d65b;
     transition: all 0.05s ease;
     transform: translateY(-8px);
   }
 
   &:disabled .top {
-    color: #eeeeee;
-    background-color: #444444;
+    background-color: #978130;
   }
 
   &:focus:enabled {
