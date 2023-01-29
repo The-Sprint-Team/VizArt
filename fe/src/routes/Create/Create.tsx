@@ -43,8 +43,8 @@ export default function Create() {
   const start = () => ref.current?.start();
   const stop = () => ref.current?.stop();
   const pause = () => ref.current?.pause();
-  const onRecordEnd = (b: Blob) => {
-    api.uploadFile("DEFAULT NAME", b).then(console.log).catch(console.error);
+  const onRecordEnd = (b: Blob, thumb: string) => {
+    api.uploadFile("DEFAULT NAME", b, thumb).then(console.log).catch(console.error);
   };
 
   const [artName, setArtName] = useState(convertTime(new Date()));
