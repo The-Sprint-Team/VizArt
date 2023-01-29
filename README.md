@@ -1,4 +1,4 @@
-# 🖌️ VizArt Computer Vision Drawing Platform
+# 🤖🖌️ [VizArt Computer Vision Drawing Platform](https://vizart.tech)
 
 Create and share your artwork with the world using VizArt - a simple yet powerful air drawing platform.
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/65676392/215330789-e38f2b41-1d7b-45b9-bb4f-09be3ffb9bf8.png">
