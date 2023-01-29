@@ -5,7 +5,7 @@ import {
   useImperativeHandle,
   ForwardedRef,
 } from "react";
-import { Hands, Results, HAND_CONNECTIONS, NormalizedLandmarkList } from "@mediapipe/hands";
+import { Hands, Results, HAND_CONNECTIONS, NormalizedLandmarkList, Landmark } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawLandmarks, drawConnectors, NormalizedLandmark } from "@mediapipe/drawing_utils";
 import "./Canvas.scss";
@@ -14,12 +14,6 @@ export interface Props {
   width: number;
   height: number;
   onRecordEnd?: (data: Blob) => any;
-  onStartDraw: (e: Event) => void;
-  onStopDraw: (e: Event) => void;
-  onStartErase: (e: Event) => void;
-  onStopErase: (e: Event) => void;
-  onStartColorPicker: (e: Event) => void;
-  onStopColorPicker: (e: Event) => void;
 }
 
 export interface Ref {
@@ -27,40 +21,30 @@ export interface Ref {
   pause: () => void;
   stop: () => void;
 }
-
-type Event = {
-    a: Action,
-    d: string
-}
-
 enum Action {
-    StartErase,
-    StopErase,
-    StartDraw,
-    StopDraw,
-    StartColorPicker,
-    StopColorPicker,
+    Erase,
+    Draw,
+    None
 }
 
 let points: [[number, number], [number, number], string][] = []; // [x, y, color][]
-let prevR: any = null;
-let prevL: any = null;
+let prev: any = [null, null]; // [[x, y], hand]
 let color: string = "black";
 
-function distP(p1: [number, number], p2: NormalizedLandmark, cvs: HTMLCanvasElement): number {
+function distP(p1: [number, number], p2: Landmark, cvs: HTMLCanvasElement): number {
     // console.log(p1, p2)
     let vec = [p1[0] - p2.x * cvs.width, p1[1] - p2.y * cvs.height];
     let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
     return mag;
 }
 
-function dist(l1: NormalizedLandmark, l2: NormalizedLandmark): number {
+function dist(l1: Landmark, l2: Landmark): number {
     let vec = [l1.x - l2.x, l1.y - l2.y];
     let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
     return mag;
 }
 
-function vecNorm(l1: NormalizedLandmark, l2: NormalizedLandmark): number[] {
+function vecNorm(l1: Landmark, l2: Landmark): number[] {
     let vec = [l1.x - l2.x, l1.y - l2.y];
     let mag = Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
     return [vec[0] / mag, vec[1] / mag];
@@ -81,13 +65,7 @@ function isStraight(hList: NormalizedLandmarkList[], f: number, bar: number): bo
 function onResults(
   cx: CanvasRenderingContext2D,
   cvs: HTMLCanvasElement,
-  res: Results,
-  onStartDraw: (e: Event) => void,
-  onStopDraw: (e: Event) => void,
-  onStartErase: (e: Event) => void,
-  onStopErase: (e: Event) => void,
-  onStartColorPicker: (e: Event) => void,
-  onStopColorPicker: (e: Event) => void,
+  res: Results
 ) {
   cx.restore();
   cx.clearRect(0, 0, cvs.width, cvs.height);
@@ -107,24 +85,13 @@ function onResults(
         const d1 = dist(hList[1][3], hList[2][3]);
         const d2 = dist(hList[2][3], hList[2][0]);
         if (isStraight(hList, 1, Math.PI / 15) && d1 > d2) {
-            onStartDraw({ a: Action.StartDraw, d: ""});
             let next: [number, number] = [hList[1][3].x * cvs.width, hList[1][3].y * cvs.height];
-            if (h.label === "Right") {
-                if (prevR) {
-                    points.push([prevR, next, (' ' + color).slice(1)]);
-                }
-                prevR = next;
+            if (prev[0]) {
+                points.push([prev[0], next, (' ' + color).slice(1)]);
             }
-            if (h.label === "Left") {
-                if (prevL) {
-                    points.push([prevL, next, (' ' + color).slice(1)]);
-                }
-                prevL = next;
-            }
+            prev[0] = next;
         } else {
-            onStopDraw({ a: Action.StopDraw, d: ""});
-            if (h.label === "Right") { prevR = null; }
-            if (h.label === "Left") { prevL = null; }
+            prev[0] = null;
         }
 
         // erase
@@ -136,7 +103,6 @@ function onResults(
             if (hList[i][3].y > hList[i][2].y) { allAbove = false; }
         }
         if (allStraight && allAbove) {
-            onStartErase({ a: Action.StartErase, d: ""});
             cx.beginPath();
             cx.arc(hList[2][3].x * cvs.width, hList[2][3].y * cvs.height, radius, 0, 2 * Math.PI);
             cx.stroke();
@@ -147,7 +113,7 @@ function onResults(
                     points.splice(i, 1);
                 }
             }
-        } else { onStopErase({ a: Action.StopErase, d: ""}); }
+        }
 
         // color picker
         const dc1 = dist(hList[1][3], hList[0][3]);
@@ -162,18 +128,18 @@ function onResults(
         left_ = left;
         left = (left + (left_ + right) / 2) / 2;
         right = (right + (left_ + right) / 2) / 2;
-        const wi = Math.abs(right - left);
+        const wi = right - left;
         let top = hList[1][1].y * cvs.height;
         let top_ = top;
         let bot = hList[0][1].y * cvs.height ;
         top = (top + (top_ + bot) / 2) / 2;
         bot = (bot + (top_ + bot) / 2) / 2;
         top_ = top;
-        const he = Math.abs(bot - top);
+        const he = bot - top;
 
         if ((dc1 < dc2 || dc1 < dc3) && (wi > 1 && he > 1)) {
             cx.strokeStyle = "black";
-            cx.strokeRect(left - 2, top + 2, wi + 4, he + 4);
+            cx.strokeRect(left, top, wi, he);
             const imageData = cx.getImageData(left, top, wi, he);
             let rSum = 0, gSum = 0, bSum = 0, aSum = 0;
             const l = imageData.data.length;
@@ -188,8 +154,7 @@ function onResults(
             const b = bSum * 4 / l;
             const a = aSum * 4 / l;
             color = `rgba(${r}, ${g}, ${b}, ${a})`;
-            onStartColorPicker({ a: Action.StartColorPicker, d: color });
-        } else {  onStopColorPicker({ a: Action.StopColorPicker, d: color }); }
+        }
     }
   // console.log(results)
 
@@ -217,7 +182,7 @@ function onResults(
 }
 
 function Canvas_(
-  { width, height, onRecordEnd, onStartDraw, onStopDraw, onStartErase, onStopErase, onStartColorPicker, onStopColorPicker }: Readonly<Props>,
+  { width, height, onRecordEnd }: Readonly<Props>,
   ref: ForwardedRef<Ref>
 ) {
   const cvs = useRef<HTMLCanvasElement | null>(null);
@@ -267,7 +232,7 @@ function Canvas_(
 
     hands.current!.onResults((r) => {
       if (cx.current && cvs.current) {
-        onResults(cx.current, cvs.current, r, onStartDraw, onStopDraw, onStartErase, onStopErase, onStartColorPicker, onStopColorPicker );
+        onResults(cx.current, cvs.current, r);
       }
     });
 
