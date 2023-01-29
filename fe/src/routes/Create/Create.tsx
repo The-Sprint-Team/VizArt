@@ -251,13 +251,13 @@ export default function Create({ forcedTitle }: Props) {
 
               <TutorialBlock
                 title="Draw"
-                description="Draw with your finger tips straight!"
+                description="Draw with your index finger straight!"
                 image="demoDraw.png"
               />
               <hr />
               <TutorialBlock
                 title="Nothing"
-                description="Qqueeze fist for no actions"
+                description="Squeeze fist for no actions"
                 image="demoNothing.png"
               />
               <hr />
@@ -269,24 +269,15 @@ export default function Create({ forcedTitle }: Props) {
               <hr />
               <TutorialBlock
                 title="Color Pick"
-                description="Pick a color in the real world by doing an 'ok' sign"
+                description="Pick a color in the real world by doing an 'ok' sign!"
                 image="demoColorPick.png"
               />
-              {/* <TutorialBlock
-            title="Copy"
-            description="draw with your finger tip"
-            image=""
-          />
-          <TutorialBlock
-            title="Paste"
-            description="draw with your finger tip"
-            image=""
-          />
-          <TutorialBlock
-            title="Record"
-            description="draw with your finger tip"
-            image=""
-          /> */}
+                <TutorialBlock
+                title="Recording"
+                description="Record your drawing video and submit it!"
+                image="demoRecord.png"
+              />
+
             </div>
 
             <div className={styles.floatingTutorial}>
@@ -324,8 +315,8 @@ export default function Create({ forcedTitle }: Props) {
           <div className={styles.competitionModal}>
             <h1 className={styles.tutTitle}>McHacks 10 Competition</h1>
             <p className={styles.tutSubtitle}>
-              VizArt AI is having a competition for McHacks 10! We will showcase
-              the best drawing of a face at 5PM ET on January 29! You only have
+            Join the VizArt competition for McHacks 10! We will showcase the best 
+            drawings of a TREE 🌲 on January 29 at 5PM EST! You only have
               60 seconds, but you have unlimited attempts. Get to creating and
               good luck!
             </p>
