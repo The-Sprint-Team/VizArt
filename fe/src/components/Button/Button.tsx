@@ -6,6 +6,7 @@ type Props = {
   onClick: () => void;
   fontSize?: number;
   width?: number;
+  disabled?: boolean;
 };
 
 export default function Button({
@@ -14,13 +15,14 @@ export default function Button({
   onClick,
   isPressed,
   width,
+  disabled,
 }: Props) {
   return (
     <button
       className={styles.button}
       data-pressed={isPressed}
-      // style={fontSize ? { fontSize: fontSize } : {}}
       style={{ fontSize: fontSize, width: width }}
+      disabled={disabled}
       onClick={() => onClick()}
     >
       <span className={styles.top}>{name}</span>

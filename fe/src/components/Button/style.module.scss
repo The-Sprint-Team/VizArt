@@ -20,16 +20,21 @@
     transform: translateY(-8px);
   }
 
-  &:focus {
+  &:disabled .top {
+    color: #eeeeee;
+    background-color: #444444;
+  }
+
+  &:focus:enabled {
     outline: none;
   }
 
-  &:hover .top {
+  &:hover:enabled .top {
     cursor: pointer;
     transform: translateY(-6px);
   }
 
-  &:active .top {
+  &:active:enabled .top {
     transform: translateY(-1px);
   }
 

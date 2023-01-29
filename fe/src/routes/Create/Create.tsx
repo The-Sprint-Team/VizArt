@@ -59,13 +59,14 @@ export default function Create({ forcedTitle }: Props) {
     a: Action.None,
     d: "",
   });
+  const [vid, setVid] = useState<{ b: Blob; thumb: string } | null>(null);
 
   const ref = useRef<CanvasRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const startRecording = () => ref.current?.start();
   const stopRecording = () => ref.current?.stop();
   const onRecordEnd = (b: Blob, thumb: string) => {
-    api.uploadFile(artName, b, thumb).then(console.log).catch(console.error);
+    setVid({ b, thumb });
   };
 
   const interval = useRef<NodeJS.Timer>();
@@ -105,7 +106,12 @@ export default function Create({ forcedTitle }: Props) {
 
   const onPublish = () => {
     updateShowPublish();
-    //publish
+    if (vid !== null) {
+      api
+        .uploadFile(artName, vid.b, vid.thumb)
+        .then(console.log)
+        .catch(console.error);
+    }
   };
 
   const onStart = () => {
@@ -118,7 +124,7 @@ export default function Create({ forcedTitle }: Props) {
 
   const resetDrawing = () => {};
 
-  const onRestart = () => {
+  const onStop = () => {
     stopRecording();
     setIsStarted(false);
     setTime(0);
@@ -220,12 +226,17 @@ export default function Create({ forcedTitle }: Props) {
           <div className={styles.canvasOptions}>
             <p>{secondsToMinutesSeconds(time)}</p>
             <Button
-              name={isStarted ? "Restart" : "Start"}
+              name={isStarted ? "Stop" : "Start"}
               isPressed={false}
-              onClick={isStarted ? onRestart : onStart}
+              onClick={isStarted ? onStop : onStart}
               width={100}
             />
-            <Button name="Publish" isPressed={false} onClick={onPublish} />
+            <Button
+              name="Publish"
+              isPressed={false}
+              onClick={onPublish}
+              disabled={vid === null || artName === ""}
+            />
           </div>
         </div>
 
