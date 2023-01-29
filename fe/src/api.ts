@@ -7,7 +7,7 @@ const api = {
       method: "GET",
     })
       .then((r) => r.json())
-      .then((d) => d.data Record<string, string>);
+      .then((d) => d.data as Record<string, string>);
   },
 
   /// Upload a file with the given name, returning the id.
