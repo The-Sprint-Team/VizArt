@@ -20,6 +20,7 @@ import {
   NormalizedLandmark,
 } from "@mediapipe/drawing_utils";
 import styles from "./style.module.scss";
+import deepai from "deepai";
 
 export interface Props {
   width: number;
@@ -342,11 +343,16 @@ function onResults(
 
     // fk u
     if (
-      isStraight(hList, 2, Math.PI / 15) &&
+      (isStraight(hList, 2, Math.PI / 15) &&
       !isPerp(hList[2][2], hList[2][3], hList[1][2], hList[1][3]) &&
       !isPerp(hList[2][2], hList[2][3], hList[3][2], hList[3][3]) &&
       !isPerp(hList[2][2], hList[2][3], hList[4][2], hList[4][3]) &&
-      hList[2][3].y - hList[2][1].y < 0
+      hList[2][3].y - hList[2][1].y < 0) ||
+      (isStraight(hList, 4, Math.PI / 15) &&
+      !isPerp(hList[4][2], hList[4][3], hList[1][2], hList[1][3]) &&
+      !isPerp(hList[4][2], hList[4][3], hList[2][2], hList[2][3]) &&
+      !isPerp(hList[4][2], hList[4][3], hList[3][2], hList[3][3]) &&
+      hList[4][3].y - hList[4][1].y < 0)
     ) {
       onActionChange({ a: Action.Clear, d: "fk u" });
       fku = true;
