@@ -210,7 +210,7 @@ export default function Create() {
         </div>
       </div>
 
-      <Tutorial isVisible={showTutorial} width={1000} height={800}>
+      <Tutorial isVisible={showTutorial} width={800} height={600}>
         <>
           <h1>Tutorial</h1>
           <Button name="Close" isPressed={false} onClick={updateShowTutorial} />

@@ -10,21 +10,24 @@
   justify-content: center;
 }
 
+body::-webkit-scrollbar {
+  width: 0;
+}
+body {
+  overflow-y: scroll;
+  padding-right: 17px; /* Add a 17px padding to compensate for the hidden scrollbar */
+}
 .content {
+
   outline: none;
   background-color: #ffffff;
   border-radius: 10px;
   padding: 20px;
-
+  border-radius: 25px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: auto;
     
-  h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;;
-  }
 }
 
