@@ -16,8 +16,9 @@ function App() {
           <Route path="create" element={<Create />} />
           <Route path="compete" element={<Compete />} />
           <Route path="explore" element={<Explore />} />
+          <Route path="" element={<Navigate to="/create" replace={true} />} />
         </Route>
-        <Route path="*" element={<Navigate to="/create" />} />
+        <Route path="*" element={<Navigate to="/create" replace={true} />} />
       </Routes>
     </BrowserRouter>
   );
